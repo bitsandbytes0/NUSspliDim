@@ -56,9 +56,6 @@ static inline const char *transformPassword(TITLE_KEY in)
             return "1234";
         case TITLE_KEY_:
             return "";
-        default:
-            debugPrintf("Unknown password!");
-            return "mypass"; // Seems to work so far even for newest releases
     }
 }
 
