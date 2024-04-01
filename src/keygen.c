@@ -84,15 +84,13 @@ bool generateKey(const TitleEntry *te, uint8_t *out)
 
     // The key is the password salted with the md5 hash from above
     const char *pw = transformPassword(te->key);
-    debugPrintf("Using password \"%s\"", pw);
     mbedtls_md_context_t ctx;
     mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(MBEDTLS_MD_SHA1), 1);
     if(mbedtls_pkcs5_pbkdf2_hmac(&ctx, (const unsigned char *)pw, strlen(pw), key, 16, 20, 16, key) != 0)
         return false;
 
     // The final key needs to be AES encrypted with the Wii U common key and part of the title ID padded with zeroes as IV
-    uint8_t iv[16];
-    OSBlockMove(iv, &(te->tid), 8, false);
-    OSBlockSet(iv + 8, 0, 8);
-    return encryptAES(key, 16, getCommonKey(), iv, out);
+    OSBlockMove(out, &(te->tid), 8, false);
+    OSBlockSet(out + 8, 0, 8);
+    return encryptAES(key, 16, getCommonKey(), out, out);
 }
