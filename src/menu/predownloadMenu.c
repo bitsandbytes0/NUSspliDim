@@ -784,10 +784,9 @@ naNedNa:
             {
                 disableApd();
                 ret = !proccessQueue();
+                enableApd();
                 if(!ret)
                     showFinishedScreen(entry->name, operation == OPERATION_DOWNLOAD_INSTALL ? FINISHING_OPERATION_INSTALL : FINISHING_OPERATION_DOWNLOAD);
-
-                enableApd();
             }
         }
     }
@@ -795,10 +794,9 @@ naNedNa:
     {
         disableApd();
         ret = !downloadTitle(tmd, rambuf->size, entry, titleVer, folderName, operation == OPERATION_DOWNLOAD_INSTALL, dlDev, instDev & NUSDEV_USB, keepFiles, NULL);
+        enableApd();
         if(!ret)
             showFinishedScreen(entry->name, operation == OPERATION_DOWNLOAD_INSTALL ? FINISHING_OPERATION_INSTALL : FINISHING_OPERATION_DOWNLOAD);
-
-        enableApd();
     }
     else
         ret = true;

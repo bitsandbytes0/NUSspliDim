@@ -198,10 +198,10 @@ refreshDir:
             if(checkSystemTitleFromTid(tmd->tid, false))
             {
                 disableApd();
-                if(install(nd, false, dev, dir, toDev & NUSDEV_USB, keepFiles, tmd))
-                    showFinishedScreen(nd, FINISHING_OPERATION_INSTALL);
-
+                redraw = install(nd, false, dev, dir, toDev & NUSDEV_USB, keepFiles, tmd);
                 enableApd();
+                if(redraw)
+                    showFinishedScreen(nd, FINISHING_OPERATION_INSTALL);
             }
 
             break;
