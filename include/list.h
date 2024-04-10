@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include <coreinit/memdefaultheap.h>
+#include <coreinit/memory.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -48,10 +49,8 @@ extern "C"
     {
         LIST *ret = MEMAllocFromDefaultHeap(sizeof(LIST));
         if(ret != NULL)
-        {
-            ret->first = ret->last = NULL;
-            ret->size = 0;
-        }
+            OSBlockSet(ret, 0x00, sizeof(LIST));
+
         return ret;
     }
 
@@ -68,8 +67,7 @@ extern "C"
             MEMFreeToDefaultHeap(tmp);
         }
 
-        list->last = NULL;
-        list->size = 0;
+        OSBlockSet(&list->last, 0x00, sizeof(LIST) - sizeof(ELEMENT));
     }
 
     static inline void destroyList(LIST *list, bool freeContents)
