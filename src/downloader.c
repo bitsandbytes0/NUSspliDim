@@ -234,7 +234,6 @@ bool initDownloader()
 {
     initNetwork();
 
-    void *buf;
     struct curl_blob blob = { .data = NULL, .flags = CURL_BLOB_COPY };
     blob.len = readFile(ROMFS_PATH "ca-certs.pem", &blob.data);
     if(blob.data == NULL)
@@ -282,6 +281,7 @@ bool initDownloader()
                                         ret = curl_easy_setopt(curl, opt, blob);
                                         if(ret == CURLE_OK)
                                         {
+                                            MEMFreeToDefaultHeap(blob.data);
                                             opt = CURLOPT_LOW_SPEED_LIMIT;
                                             ret = curl_easy_setopt(curl, opt, 1L);
                                             if(ret == CURLE_OK)
@@ -293,14 +293,11 @@ bool initDownloader()
                                                     opt = CURLOPT_ACCEPT_ENCODING;
                                                     ret = curl_easy_setopt(curl, opt, "");
                                                     if(ret == CURLE_OK)
-                                                    {
-                                                        if(blob.data != NULL)
-                                                            MEMFreeToDefaultHeap(blob.data);
-
                                                         return true;
-                                                    }
                                                 }
                                             }
+
+                                            blob.data = NULL;
                                         }
                                     }
                                 }
