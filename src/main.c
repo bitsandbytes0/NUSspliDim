@@ -214,6 +214,9 @@ static void innerMain()
                     drawByeFrame();
                 }
 
+                if(cfwError == NULL)
+                    getFreeSpace(NUSDEV_SD);
+
                 shutdownRenderer();
                 locCleanUp();
                 debugPrintf("SDL closed");

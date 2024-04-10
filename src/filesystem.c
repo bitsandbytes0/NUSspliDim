@@ -109,8 +109,6 @@ static void checkSpaceThread()
 
 void deinitFS(bool validCfw)
 {
-    checkSpaceThread();
-
     if(validCfw)
     {
         FSAUnmount(handle, "/vol/app_sd", FSA_UNMOUNT_FLAG_BIND_MOUNT);
