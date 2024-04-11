@@ -39,21 +39,15 @@ bool initStaticMem()
         staticMemLineBuffer = MEMAllocFromDefaultHeap(TO_FRAME_BUFFER_SIZE);
         if(staticMemLineBuffer != NULL)
         {
-            for(int i = 0; i < 4; ++i)
+            uint8_t *buf = MEMAllocFromDefaultHeap(FS_MAX_PATH * 4);
+            if(buf != NULL)
             {
-                staticMemPathBuffer[i] = MEMAllocFromDefaultHeapEx(FS_MAX_PATH, 0x40); // Alignmnt is important for MCP!
-                if(staticMemPathBuffer[i] == NULL)
-                {
-                    for(--i; i >= 0; --i)
-                        MEMFreeToDefaultHeap(staticMemPathBuffer[i]);
+                for(int i = 0; i < 4; ++i, buf += FS_MAX_PATH)
+                    staticMemPathBuffer[i] = buf;
 
-                    goto staticFailure;
-                }
+                return true;
             }
 
-            return true;
-
-        staticFailure:
             MEMFreeToDefaultHeap(staticMemLineBuffer);
         }
 
@@ -67,8 +61,7 @@ void shutdownStaticMem()
 {
     MEMFreeToDefaultHeap(staticMemToFrameBuffer);
     MEMFreeToDefaultHeap(staticMemLineBuffer);
-    for(int i = 0; i < 4; ++i)
-        MEMFreeToDefaultHeap(staticMemPathBuffer[i]);
+    MEMFreeToDefaultHeap(staticMemPathBuffer[0]);
 }
 
 char *getStaticScreenBuffer()

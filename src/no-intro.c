@@ -39,7 +39,7 @@ void destroyNoIntroData(NO_INTRO_DATA *data)
 
 void revertNoIntro(NO_INTRO_DATA *data)
 {
-    char *newPath = MEMAllocFromDefaultHeapEx(FS_MAX_PATH, 0x40);
+    char *newPath = MEMAllocFromDefaultHeap(FS_MAX_PATH);
     if(newPath == NULL)
     {
         debugPrintf("EOM!");
@@ -110,56 +110,52 @@ void revertNoIntro(NO_INTRO_DATA *data)
 
 NO_INTRO_DATA *transformNoIntro(const char *path)
 {
-    char *newPath = MEMAllocFromDefaultHeapEx(FS_MAX_PATH, 0x40);
-    if(newPath == NULL)
-    {
-        debugPrintf("EOM!");
-        return NULL;
-    }
-
-    char *pathTo = MEMAllocFromDefaultHeapEx(FS_MAX_PATH, 0x40);
-    if(pathTo == NULL)
-    {
-        MEMFreeToDefaultHeap(newPath);
-        debugPrintf("EOM!");
-        return NULL;
-    }
-
     NO_INTRO_DATA *data = MEMAllocFromDefaultHeap(sizeof(NO_INTRO_DATA));
     if(data == NULL)
     {
-        MEMFreeToDefaultHeap(newPath);
-        MEMFreeToDefaultHeap(pathTo);
+        debugPrintf("EOM!");
+        return NULL;
+    }
+
+    data->path = MEMAllocFromDefaultHeap(FS_MAX_PATH);
+    if(data->path == NULL)
+    {
+        MEMFreeToDefaultHeap(data);
+        debugPrintf("EOM!");
+        return NULL;
+    }
+
+    char *pathTo = MEMAllocFromDefaultHeap(FS_MAX_PATH);
+    if(pathTo == NULL)
+    {
+        destroyNoIntroData(data);
         debugPrintf("EOM!");
         return NULL;
     }
 
     size_t s = strlen(path);
-    OSBlockMove(newPath, path, s, false);
-    if(newPath[s - 1] != '/')
-        newPath[s++] = '/';
+    OSBlockMove(data->path, path, s, false);
+    if(data->path[s - 1] != '/')
+        data->path[s++] = '/';
 
-    newPath[s] = '\0';
+    data->path[s] = '\0';
 
-    OSBlockMove(pathTo, newPath, s + 1, false);
+    OSBlockMove(pathTo, data->path, ++s, false);
 
-    char *p = newPath + s;
     FSADirectoryHandle dir;
-    FSError ret = FSAOpenDir(getFSAClient(), newPath, &dir);
+    FSError ret = FSAOpenDir(getFSAClient(), data->path, &dir);
     if(ret != FS_ERROR_OK)
     {
-        debugPrintf("Can't open %s: %s", newPath, translateFSErr(ret));
-        MEMFreeToDefaultHeap(newPath);
+        debugPrintf("Can't open %s: %s", data->path, translateFSErr(ret));
+        destroyNoIntroData(data);
         MEMFreeToDefaultHeap(pathTo);
-        MEMFreeToDefaultHeap(data);
         return NULL;
     }
 
     FSADirectoryEntry entry;
-    char *fromP = newPath + s;
+    char *fromP = data->path + --s;
     char *toP = pathTo + s;
 
-    data->path = newPath;
     data->hadTicket = false;
     data->tmdFound = false;
     data->ac = 0;
@@ -174,15 +170,11 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
         {
             OSBlockMove(fromP, "tmd", strlen("tmd") + 1, false);
             OSBlockMove(toP, "title.tmd", strlen("title.tmd") + 1, false);
-            ret = FSARename(getFSAClient(), newPath, pathTo);
+            ret = FSARename(getFSAClient(), data->path, pathTo);
             if(ret != FS_ERROR_OK)
             {
-                debugPrintf("Can't move %s to %s: %s", newPath, pathTo, translateFSErr(ret));
-                MEMFreeToDefaultHeap(pathTo);
-                FSACloseDir(getFSAClient(), dir);
-                *fromP = '\0';
-                revertNoIntro(data);
-                return NULL;
+                debugPrintf("Can't move %s to %s: %s", data->path, pathTo, translateFSErr(ret));
+                goto transformError1;
             }
 
             data->tmdFound = true;
@@ -191,15 +183,11 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
         {
             OSBlockMove(fromP, "cetk", strlen("cetk") + 1, false);
             OSBlockMove(toP, "title.tik", strlen("title.tik") + 1, false);
-            ret = FSARename(getFSAClient(), newPath, pathTo);
+            ret = FSARename(getFSAClient(), data->path, pathTo);
             if(ret != FS_ERROR_OK)
             {
-                debugPrintf("Can't move %s to %s: %s", newPath, pathTo, translateFSErr(ret));
-                MEMFreeToDefaultHeap(pathTo);
-                FSACloseDir(getFSAClient(), dir);
-                *fromP = '\0';
-                revertNoIntro(data);
-                return NULL;
+                debugPrintf("Can't move %s to %s: %s", data->path, pathTo, translateFSErr(ret));
+                goto transformError1;
             }
 
             data->hadTicket = true;
@@ -209,15 +197,11 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
             OSBlockMove(fromP, entry.name, 9, false);
             OSBlockMove(toP, entry.name, 8, false);
             OSBlockMove(toP + 8, ".app", strlen(".app") + 1, false);
-            ret = FSARename(getFSAClient(), newPath, pathTo);
+            ret = FSARename(getFSAClient(), data->path, pathTo);
             if(ret != FS_ERROR_OK)
             {
-                debugPrintf("Can't move %s to %s: %s", newPath, pathTo, translateFSErr(ret));
-                MEMFreeToDefaultHeap(pathTo);
-                FSACloseDir(getFSAClient(), dir);
-                *fromP = '\0';
-                revertNoIntro(data);
-                return NULL;
+                debugPrintf("Can't move %s to %s: %s", data->path, pathTo, translateFSErr(ret));
+                goto transformError1;
             }
 
             data->ac++;
@@ -226,6 +210,7 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
 
     FSACloseDir(getFSAClient(), dir);
     MEMFreeToDefaultHeap(pathTo);
+    fromP = '\0';
 
     if(!data->tmdFound || !data->ac)
     {
@@ -233,41 +218,39 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
         return NULL;
     }
 
-    *fromP = '\0';
-
 #ifndef NUSSPLI_LITE
-    TMD *tmd = getTmd(newPath, false);
+    TMD *tmd = getTmd(data->path, false);
     if(tmd == NULL)
-    {
-        *fromP = '\0';
-        revertNoIntro(data);
-        return NULL;
-    }
+        goto transformError2;
 
     OSBlockMove(fromP, "title.tik", strlen("title.tik") + 1, false);
     if(!data->hadTicket)
     {
-        debugPrintf("Creating ticket at at %s", newPath);
-        if(!generateTik(newPath, getTitleEntryByTid(tmd->tid), tmd))
+        debugPrintf("Creating ticket at at %s", data->path);
+        if(!generateTik(data->path, getTitleEntryByTid(tmd->tid), tmd))
         {
-            debugPrintf("Error creating ticket at %s", newPath);
-            *fromP = '\0';
-            revertNoIntro(data);
-            return NULL;
+            debugPrintf("Error creating ticket at %s", data->path);
+            goto transformError2;
         }
     }
 
     OSBlockMove(fromP, "title.cert", strlen("title.cert") + 1, false);
-    debugPrintf("Creating cert at %s", newPath);
-    if(!generateCert(tmd, NULL, 0, newPath))
+    debugPrintf("Creating cert at %s", data->path);
+    if(!generateCert(tmd, NULL, 0, data->path))
     {
-        debugPrintf("Error creating cert at %s", newPath);
-        *fromP = '\0';
-        revertNoIntro(data);
-        return NULL;
+        debugPrintf("Error creating cert at %s", data->path);
+        goto transformError2;
     }
 #endif
 
     *fromP = '\0';
     return data;
+
+transformError1:
+    MEMFreeToDefaultHeap(pathTo);
+    FSACloseDir(getFSAClient(), dir);
+transformError2:
+    *fromP = '\0';
+    revertNoIntro(data);
+    return NULL;
 }

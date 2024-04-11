@@ -232,41 +232,40 @@ size_t readFile(const char *path, void **buffer)
 
 size_t getDirsize(const char *path)
 {
-    char *newPath = MEMAllocFromDefaultHeapEx(FS_MAX_PATH, 0x40);
+    char *newPath = MEMAllocFromDefaultHeap(FS_MAX_PATH);
     if(newPath == NULL)
         return 0;
 
     size_t ret = 0;
     size_t start = strlen(path);
     if(start == 0)
-        goto getDirsizeEnd;
-
-    strcpy(newPath, path);
-    if(newPath[start - 1] != '/')
     {
-        newPath[start++] = '/';
-        newPath[start] = '\0';
-    }
-
-    OSTime t = OSGetTime();
-    FSADirectoryHandle dir;
-    FSADirectoryEntry entry;
-
-    if(FSAOpenDir(getFSAClient(), path, &dir) == FS_ERROR_OK)
-    {
-        while(ret == FS_ERROR_OK && FSAReadDir(getFSAClient(), dir, &entry) == FS_ERROR_OK)
+        strcpy(newPath, path);
+        if(newPath[start - 1] != '/')
         {
-            strcpy(newPath + start, entry.name);
-            ret += entry.info.flags & FS_STAT_DIRECTORY ? getDirsize(newPath) : entry.info.size;
+            newPath[start++] = '/';
+            newPath[start] = '\0';
         }
 
-        FSACloseDir(getFSAClient(), dir);
+        OSTime t = OSGetTime();
+        FSADirectoryHandle dir;
+        FSADirectoryEntry entry;
+
+        if(FSAOpenDir(getFSAClient(), path, &dir) == FS_ERROR_OK)
+        {
+            while(ret == FS_ERROR_OK && FSAReadDir(getFSAClient(), dir, &entry) == FS_ERROR_OK)
+            {
+                strcpy(newPath + start, entry.name);
+                ret += entry.info.flags & FS_STAT_DIRECTORY ? getDirsize(newPath) : entry.info.size;
+            }
+
+            FSACloseDir(getFSAClient(), dir);
+        }
+
+        t = OSGetTime() - t;
+        addEntropy(&t, sizeof(OSTime));
     }
 
-    t = OSGetTime() - t;
-    addEntropy(&t, sizeof(OSTime));
-
-getDirsizeEnd:
     MEMFreeToDefaultHeap(newPath);
     return ret;
 }

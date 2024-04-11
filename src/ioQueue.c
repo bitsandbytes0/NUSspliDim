@@ -303,15 +303,12 @@ FSAFileHandle openFile(const char *path, const char *mode, size_t filesize)
     if(checkForQueueErrors())
         return 0;
 
-    char *newPath = getStaticPathBuffer(0);
-    strcpy(newPath, path);
-
-    if(filesize != 0 && strncmp(NUSDIR_SD, newPath, strlen(NUSDIR_SD)) == 0)
+    if(filesize != 0 && strncmp(NUSDIR_SD, path, strlen(NUSDIR_SD)) == 0)
         filesize = 0;
 
     OSTime t = OSGetTime();
     FSAFileHandle ret;
-    FSError e = FSAOpenFileEx(getFSAClient(), newPath, mode, 0x660, filesize == 0 ? FS_OPEN_FLAG_NONE : FS_OPEN_FLAG_PREALLOC_SIZE, filesize, &ret);
+    FSError e = FSAOpenFileEx(getFSAClient(), path, mode, 0x660, filesize == 0 ? FS_OPEN_FLAG_NONE : FS_OPEN_FLAG_PREALLOC_SIZE, filesize, &ret);
     if(e == FS_ERROR_OK)
     {
         t = OSGetTime() - t;
