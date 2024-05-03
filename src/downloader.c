@@ -56,7 +56,6 @@
 #include <mbedtls/x509_crt.h>
 
 #define USERAGENT        "NUSspli/" NUSSPLI_VERSION
-#define DLT_STACK_SIZE   0x8000
 #define SMOOTHING_FACTOR 0.2f
 
 static CURL *curl;
@@ -523,7 +522,7 @@ int downloadFile(const char *url, char *file, downloadData *data, FileType type,
     OSTime t = OSGetSystemTime();
 
     char *argv[1] = { (char *)&cdata };
-    OSThread *dlThread = startThread("NUSspli downloader", THREAD_PRIORITY_HIGH, DLT_STACK_SIZE, dlThreadMain, 1, (char *)argv, OS_THREAD_ATTRIB_AFFINITY_CPU2);
+    OSThread *dlThread = startThread("NUSspli downloader", THREAD_PRIORITY_HIGH, STACKSIZE_BIG, dlThreadMain, 1, (char *)argv, OS_THREAD_ATTRIB_AFFINITY_CPU2);
     if(dlThread == NULL)
         return 1;
 

@@ -36,7 +36,6 @@
 #include <string.h>
 
 #define CRASH_BUFSIZE   0x800
-#define CRASH_STACKSIZE 0x1000
 
 typedef struct BACKTRACK_LIST BACKTRACK_LIST;
 struct BACKTRACK_LIST
@@ -180,7 +179,7 @@ static BOOL defaultExceptionHandler(OSContext *ctx)
 
 bool initExceptionHandler()
 {
-    crashThread = prepareThread("NUSspli exception handler", THREAD_PRIORITY_EXCEPTION, CRASH_STACKSIZE, exceptionHandlerThread, 0, NULL, OS_THREAD_ATTRIB_DETACHED);
+    crashThread = prepareThread("NUSspli exception handler", THREAD_PRIORITY_EXCEPTION, STACKSIZE_SMALL, exceptionHandlerThread, 0, NULL, OS_THREAD_ATTRIB_DETACHED);
     if(crashThread == NULL)
         return false;
 

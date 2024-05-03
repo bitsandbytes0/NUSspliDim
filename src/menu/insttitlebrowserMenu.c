@@ -42,8 +42,6 @@
 #include <coreinit/memory.h>
 #include <nn/acp/title.h>
 
-#define ASYNC_STACKSIZE                0x4000
-
 #define MAX_ITITLEBROWSER_LINES        (MAX_LINES - 3)
 #define MAX_ITITLEBROWSER_TITLE_LENGTH (MAX_TITLENAME_LENGTH >> 1)
 #define DPAD_COOLDOWN_FRAMES           30 // half a second at 60 FPS
@@ -248,7 +246,7 @@ static OSThread *initITBMenu()
 
                     ititleEntrySize = s;
                     asyncState = ASYNC_STATE_FWD;
-                    OSThread *ret = startThread("NUSspli title loader", THREAD_PRIORITY_MEDIUM, ASYNC_STACKSIZE, asyncTitleLoader, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_CPU2);
+                    OSThread *ret = startThread("NUSspli title loader", THREAD_PRIORITY_MEDIUM, STACKSIZE_MEDIUM, asyncTitleLoader, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_CPU2);
                     if(ret)
                         return ret;
 

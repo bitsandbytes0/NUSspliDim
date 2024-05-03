@@ -32,7 +32,6 @@
 #include <thread.h>
 #include <utils.h>
 
-#define RUMBLE_STACK_SIZE 0x1000
 #define RUMBLE_QUEUE_SIZE 2
 #define LED_ON            1
 #define LED_OFF           0
@@ -69,7 +68,7 @@ bool initNotifications()
 {
     pId = GetPersistentId();
     OSInitMessageQueueEx(&rumble_queue, rumble_msg, RUMBLE_QUEUE_SIZE, "NUSspli rumble queue");
-    rumbleThread = startThread("NUSspli Rumble", THREAD_PRIORITY_LOW, RUMBLE_STACK_SIZE, rumbleThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_ANY);
+    rumbleThread = startThread("NUSspli Rumble", THREAD_PRIORITY_LOW, STACKSIZE_SMALL, rumbleThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_ANY);
     return rumbleThread != NULL;
 }
 

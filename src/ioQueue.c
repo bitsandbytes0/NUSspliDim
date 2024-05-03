@@ -38,7 +38,6 @@
 #include <thread.h>
 #include <utils.h>
 
-#define IOT_STACK_SIZE       0x1000
 #define IO_MAX_FILE_BUFFER   (1024 * 1024) // 1 MB
 #define MAX_IO_QUEUE_ENTRIES (64 * (IO_MAX_FILE_BUFFER / (1024 * 1024))) // 64 MB
 
@@ -132,7 +131,7 @@ bool initIOThread()
             activeReadBuffer = activeWriteBuffer = 0;
             ioRunning = true;
 
-            ioThread = startThread("NUSspli I/O", THREAD_PRIORITY_HIGH, IOT_STACK_SIZE, ioThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_CPU0); // We move this to core 0 for maximum performance. Later on move it back to core 1 as we want download threads on core 0 and 2.
+            ioThread = startThread("NUSspli I/O", THREAD_PRIORITY_HIGH, STACKSIZE_SMALL, ioThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_CPU0); // We move this to core 0 for maximum performance. Later on move it back to core 1 as we want download threads on core 0 and 2.
             if(ioThread != NULL)
                 return true;
 

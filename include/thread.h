@@ -27,7 +27,10 @@
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/thread.h>
 
-#define DEFAULT_STACKSIZE 0xFFF8
+#define STACKSIZE_DEFAULT 0xFFF8
+#define STACKSIZE_SMALL   0x2000
+#define STACKSIZE_MEDIUM  0x8000
+#define STACKSIZE_BIG     STACKSIZE_DEFAULT
 
 #ifdef __cplusplus
 extern "C"

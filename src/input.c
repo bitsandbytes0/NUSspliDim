@@ -36,7 +36,6 @@
 #include <padscore/wpad.h>
 #include <vpad/input.h>
 
-#define CT_STACK_SIZE    0x2000
 #define SWKBD_QUEUE_SIZE 8
 
 // WIP. This need a better implementation
@@ -157,7 +156,7 @@ static bool SWKBD_Show(SWKBD_Args *args, KeyboardLayout layout, KeyboardType typ
         return false;
     }
 
-    args->calcThread = startThread("NUSspli SWKBD font calculator", THREAD_PRIORITY_MEDIUM, CT_STACK_SIZE, calcThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_ANY);
+    args->calcThread = startThread("NUSspli SWKBD font calculator", THREAD_PRIORITY_MEDIUM, STACKSIZE_SMALL, calcThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_ANY);
     if(args->calcThread == NULL)
     {
         debugPrintf("SWKBD: Can't spawn calc thread!");
