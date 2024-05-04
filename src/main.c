@@ -215,7 +215,7 @@ static void innerMain()
                 }
 
                 if(cfwError == NULL)
-                    getFreeSpace(NUSDEV_SD);
+                    checkSpaceThread();
 
                 shutdownRenderer();
                 locCleanUp();

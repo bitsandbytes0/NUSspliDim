@@ -25,6 +25,7 @@
 #include <localisation.h>
 
 #include <file.h>
+#include <filesystem.h>
 #include <list.h>
 #include <utils.h>
 
@@ -106,6 +107,8 @@ bool locLoadLanguage(const char *langFile)
         return false;
 
     debugPrintf("Loading language file: %s", langFile);
+    // On Aroma /vol/content is redirected to the SD card, so the FS initialiser might freeze the file loading. Let's add a popup in that case
+    checkSpaceThread();
 
     void *buffer;
     size_t size = readFile(langFile, &buffer);

@@ -95,7 +95,7 @@ bool initFS(bool validCfw)
     return false;
 }
 
-static void checkSpaceThread()
+void checkSpaceThread()
 {
     if(spaceThread)
     {
