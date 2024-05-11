@@ -35,7 +35,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define CRASH_BUFSIZE   0x800
+#define CRASH_BUFSIZE 0x800
 
 typedef struct BACKTRACK_LIST BACKTRACK_LIST;
 struct BACKTRACK_LIST
