@@ -93,7 +93,7 @@ void writeScreenLog(int line)
     if(line != -1)
     {
         lineToFrame(line, SCREEN_COLOR_WHITE);
-        i = line;
+        i = line + 2;
     }
     else
         i = 1;
@@ -101,16 +101,13 @@ void writeScreenLog(int line)
     if(logList == NULL)
         return;
 
-    char *text;
+    const char *text;
     forEachListEntry(logList, text)
     {
         if(i == 1)
             textToFrame(++line, 0, text);
         else
             --i;
-
-        if(line > MAX_LINES - 2)
-            break;
     }
 }
 
