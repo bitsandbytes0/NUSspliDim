@@ -368,6 +368,8 @@ static const char *translateCurlError(CURLcode err, const char *error)
         case CURLE_READ_ERROR:
         case CURLE_OUT_OF_MEMORY:
             return "Internal error";
+        case CURLE_BAD_FUNCTION_ARGUMENT: // TODO: WUT bug
+            return "Internal WUT error";
         default:
             return error[0] == '\0' ? curl_easy_strerror(err) : error;
     }
@@ -716,7 +718,8 @@ int downloadFile(const char *url, char *file, downloadData *data, FileType type,
             case CURLE_SEND_ERROR:
             case CURLE_RECV_ERROR:
             case CURLE_PARTIAL_FILE:
-                sprintf(toScreen, "%s:\n\t%s\n\n%s", "Network error", te, "check the network settings and try again");
+            case CURLE_BAD_FUNCTION_ARGUMENT: // TODO: WUT bug
+                sprintf(toScreen, "%s:\n\t%s\n\n%s", "Network error", te, ret != CURLE_BAD_FUNCTION_ARGUMENT ? "check the network settings and try again" : "See https://github.com/V10lator/NUSspli/issues/302#issuecomment-2108134284");
                 break;
             case CURLE_PEER_FAILED_VERIFICATION:
             case CURLE_SSL_CONNECT_ERROR:
