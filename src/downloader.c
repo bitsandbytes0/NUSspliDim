@@ -336,13 +336,10 @@ void deinitDownloader()
 
 static int dlThreadMain(int argc, const char **argv)
 {
-    (void)argc;
-    (void)argv;
-
     debugPrintf("Download thread spawned!");
-    int ret = curl_easy_perform(curl);
+    argc = curl_easy_perform(curl);
     ((curlProgressData *)argv[0])->running = false;
-    return ret;
+    return argc;
 }
 
 static const char *translateCurlError(CURLcode err, const char *error)
