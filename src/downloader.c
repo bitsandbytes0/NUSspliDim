@@ -58,7 +58,7 @@
 #define USERAGENT        "NUSspli/" NUSSPLI_VERSION
 #define SMOOTHING_FACTOR 0.2f
 
-static CURL *curl;
+static volatile CURL *curl;
 static char curlError[CURL_ERROR_SIZE];
 static bool curlReuseConnection = true;
 
@@ -226,7 +226,9 @@ closeAClib:
             break;
     }
 
-    initNetwork();
+    restartUdpLog();
+    deinitDownloader();
+    initDownloader();
 }
 
 bool initDownloader()

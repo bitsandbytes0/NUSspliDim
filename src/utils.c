@@ -323,6 +323,18 @@ void debugInit()
     WHBLogCafeInit();
 }
 
+void shutdownDebug()
+{
+    WHBLogUdpDeinit();
+    WHBLogCafeDeinit();
+}
+
+void restartUdpLog()
+{
+    WHBLogUdpDeinit();
+    WHBLogUdpInit();
+}
+
 void debugPrintf(const char *str, ...)
 {
     spinLock(debugLock);

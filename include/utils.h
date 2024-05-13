@@ -38,12 +38,12 @@
 #ifdef NUSSPLI_DEBUG
 #include <whb/log.h>
 #include <whb/log_udp.h>
-#define shutdownDebug WHBLogUdpDeinit
 #else
 #define debugPrintf(...)
 #define checkStacks(...)
 #define debugInit()
 #define shutdownDebug()
+#define restartUdpLog()
 #endif
 
 #ifdef __cplusplus
@@ -80,6 +80,8 @@ extern "C"
     void showMcpProgress(McpData *data, const char *game, bool inst);
 #ifdef NUSSPLI_DEBUG
     void debugInit();
+    void shutdownDebug();
+    void restartUdpLog() __attribute__((__cold__));
     void debugPrintf(const char *str, ...);
     void checkStacks(const char *src);
 #endif
