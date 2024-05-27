@@ -42,30 +42,32 @@
 
 #define CONFIG_VERSION 2
 
-#define LANG_JAP       "Japanese"
-#define LANG_ENG       "English"
-#define LANG_FRE       "French"
-#define LANG_GER       "German"
-#define LANG_ITA       "Italian"
-#define LANG_SPA       "Spanish"
-#define LANG_CHI       "Chinese"
-#define LANG_KOR       "Korean"
-#define LANG_DUT       "Dutch"
-#define LANG_POR       "Portuguese"
-#define LANG_POR_BR    "Brazilian Portuguese"
-#define LANG_RUS       "Russian"
-#define LANG_TCH       "Traditional chinese"
-#define LANG_SYS       "System settings"
+#define LANG_JAP         "Japanese"
+#define LANG_ENG         "English"
+#define LANG_FRE         "French"
+#define LANG_GER         "German"
+#define LANG_ITA         "Italian"
+#define LANG_SPA         "Spanish"
+#define LANG_CHI         "Chinese"
+#define LANG_KOR         "Korean"
+#define LANG_DUT         "Dutch"
+#define LANG_POR         "Portuguese"
+#define LANG_POR_BR      "Brazilian Portuguese"
+#define LANG_RUS         "Russian"
+#define LANG_TCH         "Traditional chinese"
+#define LANG_SYS         "System settings"
 
-#define SET_EUR        "Europe"
-#define SET_USA        "USA"
-#define SET_JPN        "Japan"
-#define SET_ALL        "All"
+#define SET_EUR          "Europe"
+#define SET_USA          "USA"
+#define SET_JPN          "Japan"
+#define SET_ALL          "All"
 
-#define NOTIF_RUMBLE   "Rumble"
-#define NOTIF_LED      "LED"
-#define NOTIF_BOTH     "Rumble + LED"
-#define NOTIF_NONE     "None"
+#define NOTIF_RUMBLE     "Rumble"
+#define NOTIF_LED        "LED"
+#define NOTIF_BOTH       "Rumble + LED"
+#define NOTIF_NONE       "None"
+
+#define LOCALE_EXTENSION ".json"
 
 static bool changed = false;
 static bool checkForUpdates = true;
@@ -79,27 +81,19 @@ static MCPRegion regionSetting = MCP_REGION_EUROPE | MCP_REGION_USA | MCP_REGION
 #endif
 static NOTIF_METHOD notifSetting = NOTIF_METHOD_RUMBLE | NOTIF_METHOD_LED;
 
-#define LOCALE_PATH      ROMFS_PATH "locale/"
-#define LOCALE_EXTENSION ".json"
-static inline const char *getLocalisationFile(Swkbd_LanguageType language)
-{
-    if(language == Swkbd_LanguageType__English)
-        return NULL;
-
-    char *ret = getStaticPathBuffer(2);
-    OSBlockMove(ret, LOCALE_PATH, strlen(LOCALE_PATH), false);
-    strcpy(ret + strlen(LOCALE_PATH), getLanguageString(language));
-    strcat(ret + strlen(LOCALE_PATH), LOCALE_EXTENSION);
-
-    return ret;
-}
-
 static inline void intSetMenuLanguage()
 {
     locCleanUp();
-    const char *path = getLocalisationFile(menuLang == Swkbd_LanguageType__Invalid ? sysLang : menuLang);
-    if(path != NULL)
-        locLoadLanguage(path);
+    Swkbd_LanguageType language = menuLang == Swkbd_LanguageType__Invalid ? sysLang : menuLang;
+    if(language == Swkbd_LanguageType__English)
+        return;
+
+    const char *lp = getLanguageString(language);
+    char locale_path[strlen(ROMFS_PATH "locale/") + strlen(LOCALE_EXTENSION) + strlen(lp) + 1];
+    strcpy(locale_path, ROMFS_PATH "locale/");
+    strcpy(locale_path + strlen(ROMFS_PATH "locale/"), lp);
+    strcpy(locale_path + strlen(ROMFS_PATH "locale/") + strlen(lp), LOCALE_EXTENSION);
+    locLoadLanguage(locale_path);
 }
 
 Swkbd_LanguageType stringToLanguageType(const char *language)
