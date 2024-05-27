@@ -140,8 +140,14 @@ static void drawInstallerMenuFrame(const char *name, NUSDEV dev, NUSDEV toDev, b
 void installerMenu()
 {
     const char *dir = fileBrowserMenu(true, true);
-    if(dir == NULL || !AppRunning(true))
+    if(dir == NULL)
         return;
+
+    if(!AppRunning(true))
+    {
+        MEMFreeToDefaultHeap(dir);
+        return;
+    }
 
     NUSDEV dev = getDevFromPath(dir);
     bool keepFiles = dev == NUSDEV_SD;
@@ -209,7 +215,7 @@ refreshDir:
         else if(vpad.trigger & VPAD_BUTTON_MINUS)
         {
             if(!addToOpQueue(entry, dir, tmd, dev, toDev & NUSDEV_USB, keepFiles))
-                return;
+                goto cleanExit;
 
             goto grabNewDir;
         }
@@ -250,14 +256,20 @@ refreshDir:
         }
     }
 
-    MEMFreeToDefaultHeap(tmd);
+cleanExit:
+    if(tmd != NULL)
+        MEMFreeToDefaultHeap(tmd);
+
     return;
 
 grabNewDir:
-    if(!AppRunning(true))
-        return;
+    if(tmd != NULL)
+        MEMFreeToDefaultHeap(tmd);
 
-    dir = fileBrowserMenu(true, true);
-    if(dir != NULL)
-        goto refreshDir;
+    if(AppRunning(true))
+    {
+        dir = fileBrowserMenu(true, true);
+        if(dir != NULL)
+            goto refreshDir;
+    }
 }
