@@ -42,6 +42,10 @@
 #include <ticket.h>
 #include <utils.h>
 
+#define IMPORTDIR_USB1 (NUSDIR_USB1 "usr/import/")
+#define IMPORTDIR_USB2 (NUSDIR_USB2 "usr/import/")
+#define IMPORTDIR_MLC  (NUSDIR_MLC "usr/import/")
+
 static void cleanupCancelledInstallation(NUSDEV dev, const char *path, bool toUsb, bool keepFiles)
 {
     debugPrintf("Cleaning up...");
@@ -60,12 +64,12 @@ static void cleanupCancelledInstallation(NUSDEV dev, const char *path, bool toUs
         removeDirectory(path);
 
     FSADirectoryHandle dir;
-    char *importPath = getStaticPathBuffer(2);
-    strcpy(importPath, toUsb ? (getUSB() == NUSDEV_USB01 ? NUSDIR_USB1 "usr/import/" : NUSDIR_USB2 "usr/import/") : NUSDIR_MLC "usr/import/");
+    char importPath[strlen(IMPORTDIR_MLC) + 9];
+    OSBlockMove(importPath, toUsb ? (getUSB() == NUSDEV_USB01 ? IMPORTDIR_USB1 : IMPORTDIR_USB2) : IMPORTDIR_MLC, strlen(IMPORTDIR_MLC) + 1, false);
 
     if(FSAOpenDir(getFSAClient(), importPath, &dir) == FS_ERROR_OK)
     {
-        char *ptr = importPath + strlen(importPath);
+        importPath[strlen(IMPORTDIR_MLC) + 8] = '\0';
         FSADirectoryEntry entry;
 
         while(FSAReadDir(getFSAClient(), dir, &entry) == FS_ERROR_OK)
@@ -73,7 +77,7 @@ static void cleanupCancelledInstallation(NUSDEV dev, const char *path, bool toUs
             if(!(entry.info.flags & FS_STAT_DIRECTORY) || strlen(entry.name) != 8)
                 continue;
 
-            strcpy(ptr, entry.name);
+            OSBlockMove(importPath + strlen(IMPORTDIR_MLC), entry.name, 8, false);
             removeDirectory(importPath);
         }
 
