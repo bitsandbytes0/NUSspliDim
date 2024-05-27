@@ -147,7 +147,7 @@ bool install(const char *game, bool hasDeps, NUSDEV dev, const char *path, bool 
     // Fix tickets of broken NUSspli versions
     if(isDLC(tmd2->tid))
     {
-        OSBlockMove(tmpPath + s, "title.tik", sizeof("title.tik") , false);
+        OSBlockMove(tmpPath + s, "title.tik", sizeof("title.tik"), false);
         TICKET *tik;
         s = readFile(tmpPath, (void **)&tik);
         if(tik != NULL && hasMagicHeader(tik) && strcmp(tik->header.app, "NUSspli") == 0)

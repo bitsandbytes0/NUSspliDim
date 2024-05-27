@@ -40,7 +40,7 @@
 
 #include <jansson.h>
 
-#define CONFIG_VERSION 2
+#define CONFIG_VERSION   2
 
 #define LANG_JAP         "Japanese"
 #define LANG_ENG         "English"
