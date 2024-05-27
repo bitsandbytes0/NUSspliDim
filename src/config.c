@@ -89,10 +89,10 @@ static inline void intSetMenuLanguage()
         return;
 
     const char *lp = getLanguageString(language);
-    char locale_path[strlen(ROMFS_PATH "locale/") + strlen(LOCALE_EXTENSION) + strlen(lp) + 1];
+    char locale_path[(sizeof(ROMFS_PATH "locale/") + sizeof(LOCALE_EXTENSION) - 1) + strlen(lp)];
     strcpy(locale_path, ROMFS_PATH "locale/");
-    strcpy(locale_path + strlen(ROMFS_PATH "locale/"), lp);
-    strcpy(locale_path + strlen(ROMFS_PATH "locale/") + strlen(lp), LOCALE_EXTENSION);
+    strcpy(locale_path + (sizeof(ROMFS_PATH "locale/") - 1), lp);
+    strcpy(locale_path + (sizeof(ROMFS_PATH "locale/") - 1) + strlen(lp), LOCALE_EXTENSION);
     locLoadLanguage(locale_path);
 }
 

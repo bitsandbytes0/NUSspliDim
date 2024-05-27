@@ -80,16 +80,16 @@ static void generateHeader(FileType type, NUS_HEADER *out)
 {
     OSBlockMove(out->magic_header, magic_header, 10, false);
 #ifndef NUSSPLI_LITE
-    OSBlockMove(out->app, "NUSspli", strlen("NUSspli"), false);
+    OSBlockMove(out->app, "NUSspli", sizeof("NUSspli") - 1, false);
 #else
-    OSBlockMove(out->app, "NUSspli Lite", strlen("NUSspli Lite"), false);
+    OSBlockMove(out->app, "NUSspli Lite", sizeof("NUSspli Lite") - 1, false);
 #endif
-    OSBlockMove(out->app_version, NUSSPLI_VERSION, strlen(NUSSPLI_VERSION), false);
+    OSBlockMove(out->app_version, NUSSPLI_VERSION, sizeof(NUSSPLI_VERSION) - 1, false);
 
     if(type == FILE_TYPE_TIK)
-        OSBlockMove(out->file_type, "Ticket", strlen("Ticket"), false);
+        OSBlockMove(out->file_type, "Ticket", sizeof("Ticket") - 1, false);
     else
-        OSBlockMove(out->file_type, "Certificate", strlen("Certificate"), false);
+        OSBlockMove(out->file_type, "Certificate", sizeof("Certificate") - 1, false);
 
     out->sig_type = type == FILE_TYPE_TIK ? 0x00010004 : 0x00010003;
     out->meta_version = 0x01;
@@ -110,7 +110,7 @@ bool generateTik(const char *path, const TitleEntry *titleEntry, const TMD *tmd)
     ticket.ticket_id &= 0x0000FFFFFFFFFFFF;
     ticket.ticket_id |= 0x0005000000000000;
 
-    OSBlockMove(ticket.issuer, "Root-CA00000003-XS0000000c", strlen("Root-CA00000003-XS0000000c"), false);
+    OSBlockMove(ticket.issuer, "Root-CA00000003-XS0000000c", sizeof("Root-CA00000003-XS0000000c") - 1, false);
 
     ticket.version = 0x01;
     ticket.tid = tmd->tid;
@@ -206,14 +206,14 @@ bool generateCert(const TMD *tmd, const TICKET *ticket, size_t ticketSize, const
 
         OSBlockSet(&cetk, 0x00, sizeof(CETK));
 
-        OSBlockMove(cetk.cert1.issuer, "Root", strlen("Root"), false);
-        OSBlockMove(cetk.cert1.type, "CA00000003", strlen("CA00000003"), false);
+        OSBlockMove(cetk.cert1.issuer, "Root", sizeof("Root") - 1, false);
+        OSBlockMove(cetk.cert1.type, "CA00000003", sizeof("CA00000003") - 1, false);
 
-        OSBlockMove(cetk.cert2.issuer, "Root-CA00000003", strlen("Root-CA00000003"), false);
-        OSBlockMove(cetk.cert2.type, "CP0000000b", strlen("CP0000000b"), false);
+        OSBlockMove(cetk.cert2.issuer, "Root-CA00000003", sizeof("Root-CA00000003") - 1, false);
+        OSBlockMove(cetk.cert2.type, "CP0000000b", sizeof("CP0000000b") - 1, false);
 
-        OSBlockMove(cetk.cert3.issuer, "Root-CA00000003", strlen("Root-CA00000003"), false);
-        OSBlockMove(cetk.cert3.type, "XS0000000c", strlen("XS0000000c"), false);
+        OSBlockMove(cetk.cert3.issuer, "Root-CA00000003", sizeof("Root-CA00000003") - 1, false);
+        OSBlockMove(cetk.cert3.type, "XS0000000c", sizeof("XS0000000c") - 1, false);
 
         osslBytes(&cetk.cert1.sig, sizeof(cetk.cert1.sig));
         osslBytes(&cetk.cert1.cert, sizeof(cetk.cert1.cert));
@@ -392,9 +392,9 @@ void deleteTicket(uint64_t tid)
         return;
 
     char *path = getStaticPathBuffer(0);
-    OSBlockMove(path, TICKET_BUCKET, strlen(TICKET_BUCKET) + 1, false);
+    OSBlockMove(path, TICKET_BUCKET, sizeof(TICKET_BUCKET), false);
 
-    char *inSentence = path + strlen(TICKET_BUCKET);
+    char *inSentence = path + (sizeof(TICKET_BUCKET) - 1);
     FSADirectoryHandle dir;
     OSTime t = OSGetTime();
     FSError ret = FSAOpenDir(getFSAClient(), path, &dir);

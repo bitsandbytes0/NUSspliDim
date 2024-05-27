@@ -302,7 +302,7 @@ FSAFileHandle openFile(const char *path, const char *mode, size_t filesize)
     if(checkForQueueErrors())
         return 0;
 
-    if(filesize != 0 && strncmp(NUSDIR_SD, path, strlen(NUSDIR_SD)) == 0)
+    if(filesize != 0 && strncmp(NUSDIR_SD, path, sizeof(NUSDIR_SD) - 1) == 0)
         filesize = 0;
 
     OSTime t = OSGetTime();

@@ -125,11 +125,11 @@ char *fileBrowserMenu(bool showQueue, bool allowNoIntro)
         refreshDirList:
             OSTime t = OSGetTime();
             clearList(folders, true);
-            char *name = MEMAllocFromDefaultHeap(strlen("../") + 1);
+            char *name = MEMAllocFromDefaultHeap(sizeof("../"));
             if(name == NULL)
                 goto exitFailure;
 
-            OSBlockMove(name, "../", strlen("../") + 1, false);
+            OSBlockMove(name, "../", sizeof("../"), false);
             if(!addToListEnd(folders, name))
             {
                 MEMFreeToDefaultHeap(name);
@@ -196,7 +196,7 @@ char *fileBrowserMenu(bool showQueue, bool allowNoIntro)
                 {
                     if(cursor + pos == 0)
                     {
-                        char *last = strstr(path + strlen("/vol/"), "/");
+                        char *last = strstr(path + (sizeof("/vol/") - 1), "/");
                         char *cur = strstr(last + 1, "/");
                         if(cur != NULL)
                         {

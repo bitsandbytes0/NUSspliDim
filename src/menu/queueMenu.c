@@ -87,12 +87,12 @@ static void drawQueueMenu(LIST *titleQueue, size_t cursor, size_t pos)
 
         if(isDLC(data->tmd->tid))
         {
-            p = strlen("[DLC] ");
+            p = sizeof("[DLC] ") - 1;
             OSBlockMove(toScreen, "[DLC] ", p, false);
         }
         else if(isUpdate(data->tmd->tid))
         {
-            p = strlen("[UPD] ");
+            p = sizeof("[UPD] ") - 1;
             OSBlockMove(toScreen, "[UPD] ", p, false);
         }
         else

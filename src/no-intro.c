@@ -51,7 +51,7 @@ void revertNoIntro(NO_INTRO_DATA *data)
     char *dataP = data->path + s;
     char *toP = newPath + s;
 
-    OSBlockMove(dataP, "title.tik", strlen("title.tik") + 1, false);
+    OSBlockMove(dataP, "title.tik", sizeof("title.tik"), false);
     FSError ret;
 
     flushIOQueue();
@@ -63,19 +63,19 @@ void revertNoIntro(NO_INTRO_DATA *data)
     }
     else
     {
-        OSBlockMove(toP, "cetk", strlen("cetk") + 1, false);
+        OSBlockMove(toP, "cetk", sizeof("cetk"), false);
         ret = FSARename(getFSAClient(), data->path, newPath);
         if(ret != FS_ERROR_OK)
             debugPrintf("Can't move %s to %s: %s", data->path, newPath, translateFSErr(ret));
     }
 
-    OSBlockMove(dataP, "title.cert", strlen("title.cert") + 1, false);
+    OSBlockMove(dataP, "title.cert", sizeof("title.cert"), false);
     ret = FSARemove(getFSAClient(), data->path);
     if(ret != FS_ERROR_OK)
         debugPrintf("Can't remove %s: %s", data->path, translateFSErr(ret));
 
-    OSBlockMove(dataP, "title.tmd", strlen("title.tmd") + 1, false);
-    OSBlockMove(toP, "tmd", strlen("tmd") + 1, false);
+    OSBlockMove(dataP, "title.tmd", sizeof("title.tmd"), false);
+    OSBlockMove(toP, "tmd", sizeof("tmd"), false);
     ret = FSARename(getFSAClient(), data->path, newPath);
     if(ret != FS_ERROR_OK)
         debugPrintf("Can't move %s to %s: %s", data->path, newPath, translateFSErr(ret));
@@ -168,8 +168,8 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
         strcpy(fromP, entry.name);
         if(strcmp(entry.name, "tmd") == 0)
         {
-            OSBlockMove(fromP, "tmd", strlen("tmd") + 1, false);
-            OSBlockMove(toP, "title.tmd", strlen("title.tmd") + 1, false);
+            OSBlockMove(fromP, "tmd", sizeof("tmd"), false);
+            OSBlockMove(toP, "title.tmd", sizeof("title.tmd"), false);
             ret = FSARename(getFSAClient(), data->path, pathTo);
             if(ret != FS_ERROR_OK)
             {
@@ -181,8 +181,8 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
         }
         else if(strcmp(entry.name, "cetk") == 0)
         {
-            OSBlockMove(fromP, "cetk", strlen("cetk") + 1, false);
-            OSBlockMove(toP, "title.tik", strlen("title.tik") + 1, false);
+            OSBlockMove(fromP, "cetk", sizeof("cetk"), false);
+            OSBlockMove(toP, "title.tik", sizeof("title.tik"), false);
             ret = FSARename(getFSAClient(), data->path, pathTo);
             if(ret != FS_ERROR_OK)
             {
@@ -196,7 +196,7 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
         {
             OSBlockMove(fromP, entry.name, 9, false);
             OSBlockMove(toP, entry.name, 8, false);
-            OSBlockMove(toP + 8, ".app", strlen(".app") + 1, false);
+            OSBlockMove(toP + 8, ".app", sizeof(".app"), false);
             ret = FSARename(getFSAClient(), data->path, pathTo);
             if(ret != FS_ERROR_OK)
             {
@@ -223,7 +223,7 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
     if(tmd == NULL)
         goto transformError2;
 
-    OSBlockMove(fromP, "title.tik", strlen("title.tik") + 1, false);
+    OSBlockMove(fromP, "title.tik", sizeof("title.tik"), false);
     if(!data->hadTicket)
     {
         debugPrintf("Creating ticket at at %s", data->path);
@@ -234,7 +234,7 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
         }
     }
 
-    OSBlockMove(fromP, "title.cert", strlen("title.cert") + 1, false);
+    OSBlockMove(fromP, "title.cert", sizeof("title.cert"), false);
     debugPrintf("Creating cert at %s", data->path);
     if(!generateCert(tmd, NULL, 0, data->path))
     {

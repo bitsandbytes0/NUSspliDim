@@ -261,8 +261,8 @@ static bool unzipUpdate(RAMBUF *rambuf)
                 char *zipFileName = getStaticPathBuffer(1);
                 char *path = getStaticPathBuffer(2);
                 char *fileName = getStaticPathBuffer(3);
-                strcpy(fileName, UPDATE_TEMP_FOLDER);
-                char *fnp = fileName + strlen(UPDATE_TEMP_FOLDER);
+                OSBlockMove(fileName, UPDATE_TEMP_FOLDER, sizeof(UPDATE_TEMP_FOLDER) - 1, false);
+                char *fnp = fileName + (sizeof(UPDATE_TEMP_FOLDER) - 1);
                 char *needle;
                 char *lastSlash;
                 char *lspp;
@@ -272,7 +272,7 @@ static bool unzipUpdate(RAMBUF *rambuf)
 
                 do
                 {
-                    if(unzGetCurrentFileInfo(zip, &zipFileInfo, zipFileName, FS_MAX_PATH - strlen(UPDATE_TEMP_FOLDER) - 1, NULL, 0, NULL, 0) == UNZ_OK)
+                    if(unzGetCurrentFileInfo(zip, &zipFileInfo, zipFileName, FS_MAX_PATH - sizeof(UPDATE_TEMP_FOLDER), NULL, 0, NULL, 0) == UNZ_OK)
                     {
                         if(unzOpenCurrentFile(zip) == UNZ_OK)
                         {
@@ -409,7 +409,7 @@ bool update(const char *newVersion, NUSSPLI_TYPE type)
 
     char *path = getStaticPathBuffer(2);
     strcpy(path, UPDATE_DOWNLOAD_URL);
-    strcpy(path + strlen(UPDATE_DOWNLOAD_URL), newVersion);
+    strcpy(path + (sizeof(UPDATE_DOWNLOAD_URL) - 1), newVersion);
     strcat(path, "/NUSspli-");
     strcat(path, newVersion);
 
@@ -465,13 +465,13 @@ bool update(const char *newVersion, NUSSPLI_TYPE type)
     else
     {
 #endif
-        RPXLoaderStatus rs = RPXLoader_GetPathOfRunningExecutable(path + strlen(NUSDIR_SD), FS_MAX_PATH - strlen(NUSDIR_SD));
+        RPXLoaderStatus rs = RPXLoader_GetPathOfRunningExecutable(path + (sizeof(NUSDIR_SD) - 1), FS_MAX_PATH - sizeof(NUSDIR_SD) - 1);
         if(rs == RPX_LOADER_RESULT_SUCCESS)
         {
             rs = RPXLoader_UnmountCurrentRunningBundle();
             if(rs == RPX_LOADER_RESULT_SUCCESS)
             {
-                OSBlockMove(path, NUSDIR_SD, strlen(NUSDIR_SD), false);
+                OSBlockMove(path, NUSDIR_SD, sizeof(NUSDIR_SD) - 1, false);
                 err = FSARemove(getFSAClient(), path);
                 if(err != FS_ERROR_OK)
                 {
