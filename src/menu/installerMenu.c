@@ -194,10 +194,7 @@ refreshDir:
         showFrame();
 
         if(vpad.trigger & VPAD_BUTTON_B)
-        {
-            MEMFreeToDefaultHeap(tmd);
             goto grabNewDir;
-        }
 
         if(vpad.trigger & VPAD_BUTTON_PLUS)
         {
@@ -215,7 +212,7 @@ refreshDir:
         else if(vpad.trigger & VPAD_BUTTON_MINUS)
         {
             if(!addToOpQueue(entry, dir, tmd, dev, toDev & NUSDEV_USB, keepFiles))
-                goto cleanExit;
+                break;
 
             goto grabNewDir;
         }
@@ -256,16 +253,15 @@ refreshDir:
         }
     }
 
-cleanExit:
-    if(tmd != NULL)
-        MEMFreeToDefaultHeap(tmd);
-
+    MEMFreeToDefaultHeap(tmd);
+    MEMFreeToDefaultHeap(dir);
     return;
 
 grabNewDir:
     if(tmd != NULL)
         MEMFreeToDefaultHeap(tmd);
 
+    MEMFreeToDefaultHeap(dir);
     if(AppRunning(true))
     {
         dir = fileBrowserMenu(true, true);

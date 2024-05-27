@@ -296,13 +296,26 @@ static void drawTicketGenFrame(const char *dir)
     textToFrame(3, 0, localise("Press any key to return"));
     drawFrame();
 }
+
+static void browseFiles(char *out)
+{
+    const char *dir = fileBrowserMenu(false, false);
+    if(dir)
+    {
+        strcpy(out, dir);
+        MEMFreeToDefaultHeap(dir);
+    }
+    else
+        *out = '\0';
+}
+
 void generateFakeTicket()
 {
-    char *dir;
+    char *dir[FS_MAX_PATH];
     TMD *tmd;
 gftEntry:
-    dir = fileBrowserMenu(false, false);
-    if(dir == NULL || !AppRunning(true))
+    browseFiles(dir);
+    if(*dir == '\0')
         return;
 
     tmd = getTmd(dir, false);
