@@ -15,7 +15,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
  LDFLAGS="-L$DEVKITPRO/wut/lib" \
  LIBS="-lwut -lm" \
  BROTLI_VER=1.1.0 \
- CURL_VER=8.7.1 \
+ CURL_VER=8.8.0 \
  NGHTTP2_VER=1.62.0
 
 WORKDIR /
@@ -62,9 +62,11 @@ RUN git clone --depth 1 --single-branch https://github.com/google/brotli.git && 
 
 # Install libCURL since WUT doesn't ship with the latest version
 RUN curl -LO https://curl.se/download/curl-$CURL_VER.tar.xz && \
+ curl -LO https://github.com/curl/curl/commit/0c4b4c1e93c8e869af230090f32346fdfd548f21.patch && \
  mkdir /curl && \
  tar xJf curl-$CURL_VER.tar.xz -C /curl --strip-components=1 && \
  cd curl && \
+ patch -p1 < ../0c4b4c1e93c8e869af230090f32346fdfd548f21.patch && \
  autoreconf -fi && ./configure \
 --prefix=$DEVKITPRO/portlibs/wiiu/ \
 --host=powerpc-eabi \
@@ -106,7 +108,7 @@ RUN curl -LO https://curl.se/download/curl-$CURL_VER.tar.xz && \
  cd ../include && \
  make -j$(nproc) install && \
  cd ../.. && \
- rm -rf curl curl-$CURL_VER.tar.xz
+ rm -rf curl curl-$CURL_VER.tar.xz 0c4b4c1e93c8e869af230090f32346fdfd548f21.patch
 
 # Install libSDL since upstream is bugged
 RUN curl -LO https://libsdl.org/release/SDL2-2.26.5.tar.gz && \
@@ -121,7 +123,7 @@ RUN curl -LO https://libsdl.org/release/SDL2-2.26.5.tar.gz && \
   -DCMAKE_CXX_COMPILER=$DEVKITPPC/bin/powerpc-eabi-g++ .. && \
   cmake --build . --config Release --target install -j$(nproc) && \
   cd ../.. && \
-  rm -rf sdl SDL2-2.26.5.tar.gz
+  rm -rf sdl SDL2-2.26.5.tar.gz SDL2-2.26.5.patch
 
 RUN git config --global --add safe.directory /project && \
   git config --global --add safe.directory /project/SDL_FontCache && \
