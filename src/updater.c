@@ -58,6 +58,8 @@
 #define UPDATE_TEMP_FOLDER  NUSDIR_SD "NUSspli_temp/"
 #define UPDATE_AROMA_FOLDER NUSDIR_SD "wiiu/apps/"
 
+#define MAX_ZIP_PATH_LENGTH 32
+
 #ifndef NUSSPLI_LITE
 #define UPDATE_AROMA_FILE "NUSspli.wuhb"
 #else
@@ -170,7 +172,7 @@ bool updateCheck()
 
 typedef struct
 {
-    RAMBUF *rambuf;
+    const RAMBUF *rambuf;
     long index;
 } ZIP_META;
 
@@ -234,9 +236,9 @@ static int ZCALLBACK nus_zstub(voidpf opaque, voidpf stream)
     return 0;
 }
 
-static bool unzipUpdate(RAMBUF *rambuf)
+static bool unzipUpdate(const RAMBUF *rambuf)
 {
-    ZIP_META meta = { .rambuf = rambuf, .index = 0 };
+    const ZIP_META meta = { .rambuf = rambuf, .index = 0 };
     zlib_filefunc_def rbfd = {
         .zopen_file = nus_zopen,
         .zread_file = nus_zread,
@@ -258,96 +260,79 @@ static bool unzipUpdate(RAMBUF *rambuf)
             if(buf != NULL)
             {
                 unz_file_info zipFileInfo;
-                char *zipFileName = getStaticPathBuffer(1);
-                char *path = getStaticPathBuffer(2);
-                char *fileName = getStaticPathBuffer(3);
-                OSBlockMove(fileName, UPDATE_TEMP_FOLDER, sizeof(UPDATE_TEMP_FOLDER) - 1, false);
-                char *fnp = fileName + (sizeof(UPDATE_TEMP_FOLDER) - 1);
+                char fileName[sizeof(UPDATE_TEMP_FOLDER) + MAX_ZIP_PATH_LENGTH] = UPDATE_TEMP_FOLDER;
                 char *needle;
                 char *lastSlash;
-                char *lspp;
                 FSAFileHandle file;
                 int extracted;
                 ret = true;
 
                 do
                 {
-                    if(unzGetCurrentFileInfo(zip, &zipFileInfo, zipFileName, FS_MAX_PATH - sizeof(UPDATE_TEMP_FOLDER), NULL, 0, NULL, 0) == UNZ_OK)
+                    if(unzGetCurrentFileInfo(zip, &zipFileInfo, fileName + (sizeof(UPDATE_TEMP_FOLDER) - 1), MAX_ZIP_PATH_LENGTH, NULL, 0, NULL, 0) == UNZ_OK)
                     {
                         if(unzOpenCurrentFile(zip) == UNZ_OK)
                         {
-                            needle = strchr(zipFileName, '/');
+                            needle = strchr(fileName + (sizeof(UPDATE_TEMP_FOLDER) - 1), '/');
                             if(needle != NULL)
                             {
-                                lastSlash = needle;
-                                lspp = needle + 1;
-                                needle = strchr(lspp, '/');
-                                while(needle != NULL)
+                                do
                                 {
                                     lastSlash = needle;
-                                    lspp = needle + 1;
-                                    needle = strchr(lspp, '/');
-                                }
+                                    needle = strchr(needle + 1, '/');
+                                } while(needle != NULL);
 
                                 if(lastSlash[1] == '\0')
-                                {
-                                    unzCloseCurrentFile(zip);
-                                    continue;
-                                }
+                                    goto closeCurrentZipFile;
 
-                                lastSlash[0] = '\0';
-                                strcpy(path, zipFileName);
-                                strcat(path, "/");
-                                strcpy(fnp, path);
-                                strcpy(zipFileName, lastSlash + 1);
+                                *lastSlash = '\0';
 
                                 if(!createDirRecursive(fileName))
                                 {
                                     showUpdateErrorf("%s: %s", localise("Error creating directory"), prettyDir(fileName));
                                     ret = false;
+                                    goto closeCurrentZipFile;
                                 }
-                            }
-                            else
-                                path[0] = '\0';
 
-                            if(ret)
+                                *lastSlash = '/';
+                            }
+
+                            file = openFile(fileName, "w", 0);
+                            if(file != 0)
                             {
-                                sprintf(fnp, "%s%s", path, zipFileName);
-                                file = openFile(fileName, "w", 0);
-                                if(file != 0)
+                                do
                                 {
-                                    while(ret)
+                                    extracted = unzReadCurrentFile(zip, buf, IO_BUFSIZE);
+                                    if(extracted < 0)
                                     {
-                                        extracted = unzReadCurrentFile(zip, buf, IO_BUFSIZE);
-                                        if(extracted < 0)
+                                        showUpdateErrorf("%s: %s", localise("Error extracting file"), prettyDir(fileName));
+                                        ret = false;
+                                        break;
+                                    }
+
+                                    if(extracted != 0)
+                                    {
+                                        if(addToIOQueue(buf, extracted, 1, file) != 1)
                                         {
-                                            showUpdateErrorf("%s: %s", localise("Error extracting file"), prettyDir(fileName));
+                                            showUpdateErrorf("%s: %s", localise("Error writing file"), prettyDir(fileName));
                                             ret = false;
                                             break;
                                         }
-
-                                        if(extracted != 0)
-                                        {
-                                            if(addToIOQueue(buf, 1, extracted, file) != (size_t)extracted)
-                                            {
-                                                showUpdateErrorf("%s: %s", localise("Error writing file"), prettyDir(fileName));
-                                                ret = false;
-                                                break;
-                                            }
-                                        }
-                                        else
-                                            break;
                                     }
+                                    else
+                                        break;
+                                }
+                                while(ret);
 
-                                    addToIOQueue(NULL, 0, 0, file);
-                                }
-                                else
-                                {
-                                    showUpdateErrorf("%s: %s", localise("Error opening file"), prettyDir(fileName));
-                                    ret = false;
-                                }
+                                addToIOQueue(NULL, 0, 0, file);
+                            }
+                            else
+                            {
+                                showUpdateErrorf("%s: %s", localise("Error opening file"), prettyDir(fileName));
+                                ret = false;
                             }
 
+                        closeCurrentZipFile:
                             unzCloseCurrentFile(zip);
                         }
                         else
