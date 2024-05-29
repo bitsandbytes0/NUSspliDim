@@ -57,6 +57,8 @@ static inline const char *transformPassword(TITLE_KEY in)
         case TITLE_KEY_:
             return "";
     }
+
+    return NULL; // Should never happen
 }
 
 bool generateKey(const TitleEntry *te, uint8_t *out)

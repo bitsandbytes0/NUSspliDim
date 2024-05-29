@@ -40,13 +40,13 @@
 
 static int cursorPos = MAX_LINES - 5;
 
-static bool addToOpQueue(const TitleEntry *entry, const char *dir, TMD *tmd, NUSDEV fromDev, bool toUSB, bool keepFiles)
+static bool addToOpQueue(const TitleEntry *entry, const char *dir, const TMD *tmd, NUSDEV fromDev, bool toUSB, bool keepFiles)
 {
     TitleData *titleInfo = MEMAllocFromDefaultHeap(sizeof(TitleData));
     if(titleInfo == NULL)
         return false;
 
-    titleInfo->tmd = tmd;
+    titleInfo->tmd = (TMD *)tmd;
 #ifndef NUSSPLI_LITE
     titleInfo->rambuf = NULL;
     titleInfo->operation = OPERATION_INSTALL;
@@ -63,7 +63,7 @@ static bool addToOpQueue(const TitleEntry *entry, const char *dir, TMD *tmd, NUS
 
     MEMFreeToDefaultHeap(titleInfo);
 
-    MEMFreeToDefaultHeap(tmd);
+    MEMFreeToDefaultHeap((TMD *)tmd);
     return ret;
 }
 
@@ -145,7 +145,7 @@ void installerMenu()
 
     if(!AppRunning(true))
     {
-        MEMFreeToDefaultHeap(dir);
+        MEMFreeToDefaultHeap((char *)dir);
         return;
     }
 
@@ -157,7 +157,7 @@ void installerMenu()
     if(!usbMounted)
         toDev = NUSDEV_MLC;
 
-    TMD *tmd;
+    const TMD *tmd;
     const TitleEntry *entry;
     const char *nd;
     bool redraw;
@@ -253,15 +253,15 @@ refreshDir:
         }
     }
 
-    MEMFreeToDefaultHeap(tmd);
-    MEMFreeToDefaultHeap(dir);
+    MEMFreeToDefaultHeap((TMD *)tmd);
+    MEMFreeToDefaultHeap((char *)dir);
     return;
 
 grabNewDir:
     if(tmd != NULL)
-        MEMFreeToDefaultHeap(tmd);
+        MEMFreeToDefaultHeap((TMD *)tmd);
 
-    MEMFreeToDefaultHeap(dir);
+    MEMFreeToDefaultHeap((char *)dir);
     if(AppRunning(true))
     {
         dir = fileBrowserMenu(true, true);

@@ -58,7 +58,7 @@
 #define USERAGENT        "NUSspli/" NUSSPLI_VERSION
 #define SMOOTHING_FACTOR 0.2f
 
-static volatile CURL *curl;
+static CURL *curl;
 static char curlError[CURL_ERROR_SIZE];
 static bool curlReuseConnection = true;
 
@@ -493,7 +493,9 @@ int downloadFile(const char *url, char *file, downloadData *data, FileType type,
             if(ret == CURLE_OK)
             {
                 opt = CURLOPT_WRITEFUNCTION;
-                ret = curl_easy_setopt(curl, opt, rambuf ? fwrite : (size_t(*)(const void *, size_t, size_t, FILE *))addToIOQueue); // This rises a compiler warning but that's fine
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+                ret = curl_easy_setopt(curl, opt, rambuf ? fwrite : (size_t(*)(const void *, size_t, size_t, FILE *))addToIOQueue);
+#pragma GCC diagnostic pop
                 if(ret == CURLE_OK)
                 {
                     opt = CURLOPT_WRITEDATA;

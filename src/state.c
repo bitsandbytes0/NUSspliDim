@@ -32,8 +32,10 @@
 #include <coreinit/time.h>
 #include <coreinit/title.h>
 #include <nn/acp/client.h>
+#include <nn/acp/title.h>
 #include <proc_ui/procui.h>
 #include <rpxloader/rpxloader.h>
+#include <sysapp/launch.h>
 
 #include <stdbool.h>
 
@@ -113,6 +115,8 @@ bool isChannel()
 
 uint32_t homeButtonCallback(void *dummy)
 {
+    (void)dummy;
+
     if(shutdownEnabled)
     {
         shutdownEnabled = false;

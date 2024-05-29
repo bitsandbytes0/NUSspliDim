@@ -303,7 +303,7 @@ static void browseFiles(char *out)
     if(dir)
     {
         strcpy(out, dir);
-        MEMFreeToDefaultHeap(dir);
+        MEMFreeToDefaultHeap((void *)dir);
     }
     else
         *out = '\0';
@@ -311,7 +311,7 @@ static void browseFiles(char *out)
 
 void generateFakeTicket()
 {
-    char *dir[FS_MAX_PATH];
+    char dir[FS_MAX_PATH];
     TMD *tmd;
 gftEntry:
     browseFiles(dir);

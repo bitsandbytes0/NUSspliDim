@@ -428,10 +428,9 @@ bool update(const char *newVersion, NUSSPLI_TYPE type)
     if(!unzipUpdate(rambuf))
         goto updateError;
 
-    bool toUSB = getUSB() != NUSDEV_NONE;
-
     // Uninstall currently running type/version
 #ifndef NUSSPLI_LITE
+    bool toUSB = getUSB() != NUSDEV_NONE;
     if(isChannel())
     {
         MCPTitleListType ownInfo __attribute__((__aligned__(0x40)));

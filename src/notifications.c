@@ -44,6 +44,9 @@ static uint32_t pId;
 
 static int rumbleThreadMain(int argc, const char **argv)
 {
+    (void)argc;
+    (void)argv;
+
     OSMessage msg;
 
     do

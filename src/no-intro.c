@@ -30,6 +30,7 @@
 
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/memdefaultheap.h>
+#include <coreinit/memory.h>
 
 void destroyNoIntroData(NO_INTRO_DATA *data)
 {
