@@ -5,6 +5,15 @@ COPY --from=ghcr.io/wiiu-env/librpxloader:20240425 /artifacts $DEVKITPRO
 ENV DEBIAN_FRONTEND=noninteractive \
  PATH=$DEVKITPPC/bin:$DEVKITPRO/portlibs/wiiu/bin/:$PATH \
  WUT_ROOT=$DEVKITPRO/wut \
+ CC=$DEVKITPPC/bin/powerpc-eabi-gcc \
+ AR=$DEVKITPPC/bin/powerpc-eabi-ar \
+ RANLIB=$DEVKITPPC/bin/powerpc-eabi-ranlib \
+ PKG_CONFIG=$DEVKITPRO/portlibs/wiiu/bin/powerpc-eabi-pkg-config \
+ CFLAGS="-mcpu=750 -meabi -mhard-float -Ofast -ffunction-sections -fdata-sections" \
+ CXXFLAGS="-mcpu=750 -meabi -mhard-float -Ofast -ffunction-sections -fdata-sections" \
+ CPPFLAGS="-D__WIIU__ -D__WUT__ -I$DEVKITPRO/wut/include -L$DEVKITPRO/wut/lib" \
+ LDFLAGS="-L$DEVKITPRO/wut/lib" \
+ LIBS="-lwut -lm" \
  BROTLI_VER=1.1.0 \
  CURL_VER=8.7.1 \
  NGHTTP2_VER=1.62.0
@@ -36,16 +45,7 @@ RUN curl -LO https://github.com/nghttp2/nghttp2/releases/download/v$NGHTTP2_VER/
 --prefix=$DEVKITPRO/portlibs/wiiu/ \
 --enable-static \
 --disable-threads \
---host=powerpc-eabi \
-CFLAGS="-mcpu=750 -meabi -mhard-float -Ofast -ffunction-sections -fdata-sections" \
-CXXFLAGS="-mcpu=750 -meabi -mhard-float -Ofast -ffunction-sections -fdata-sections" \
-CPPFLAGS="-D__WIIU__ -D__WUT__ -I$DEVKITPRO/wut/include" \
-LDFLAGS="-L$DEVKITPRO/wut/lib" \
-LIBS="-lwut -lm" \
-CC=$DEVKITPPC/bin/powerpc-eabi-gcc \
-AR=$DEVKITPPC/bin/powerpc-eabi-ar \
-RANLIB=$DEVKITPPC/bin/powerpc-eabi-ranlib \
-PKG_CONFIG=$DEVKITPRO/portlibs/wiiu/bin/powerpc-eabi-pkg-config && \
+--host=powerpc-eabi && \
   make -j$(nproc) install && \
   cd .. && \
   rm -rf nghttp2 nghttp2-$NGHTTP2_VER.tar.xz
@@ -54,19 +54,9 @@ PKG_CONFIG=$DEVKITPRO/portlibs/wiiu/bin/powerpc-eabi-pkg-config && \
 RUN git clone --depth 1 --single-branch https://github.com/google/brotli.git && \
  cd brotli && \
  mkdir out && cd out && \
- CC=$DEVKITPPC/bin/powerpc-eabi-gcc \
- AR=$DEVKITPPC/bin/powerpc-eabi-ar \
- RANLIB=$DEVKITPPC/bin/powerpc-eabi-ranlib \
- PKG_CONFIG=$DEVKITPRO/portlibs/wiiu/bin/powerpc-eabi-pkg-config && \
- powerpc-eabi-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu/ -DBUILD_SHARED_LIBS=OFF -DBROTLI_BUILD_TOOLS=OFF \
- -DCMAKE_C_FLAGS="-mcpu=750 -meabi -mhard-float -Ofast -ffunction-sections -fdata-sections" \
- -DCMAKE_CXX_FLAGS="-mcpu=750 -meabi -mhard-float -Ofast -ffunction-sections -fdata-sections" \
- -DCMAKE_CPP_FLAGS="-L$DEVKITPRO/wut/lib" \
- -DCMAKE_LIBS="-lwut -lm" \
- -DCMAKE_C_COMPILER=$DEVKITPPC/bin/powerpc-eabi-gcc \
- -DCMAKE_CXX_COMPILER=$DEVKITPPC/bin/powerpc-eabi-g++ \
- .. && \
- powerpc-eabi-cmake --build . --config Release --target install && \
+ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu/ -DBUILD_SHARED_LIBS=OFF -DBROTLI_BUILD_TOOLS=OFF \
+ -DCMAKE_CXX_COMPILER=$DEVKITPPC/bin/powerpc-eabi-g++ .. && \
+ cmake --build . --config Release --target install -j$(nproc) && \
  cd ../.. && \
  rm -rf brotli
 
@@ -110,16 +100,7 @@ RUN curl -LO https://curl.se/download/curl-$CURL_VER.tar.xz && \
 --disable-gopher \
 --disable-mqtt \
 --disable-manual \
---disable-docs \
-CFLAGS="-mcpu=750 -meabi -mhard-float -Ofast -ffunction-sections -fdata-sections" \
-CXXFLAGS="-mcpu=750 -meabi -mhard-float -Ofast -ffunction-sections -fdata-sections" \
-CPPFLAGS="-D__WIIU__ -D__WUT__ -I$DEVKITPRO/wut/include" \
-LDFLAGS="-L$DEVKITPRO/wut/lib" \
-LIBS="-lwut -lm" \
-CC=$DEVKITPPC/bin/powerpc-eabi-gcc \
-AR=$DEVKITPPC/bin/powerpc-eabi-ar \
-RANLIB=$DEVKITPPC/bin/powerpc-eabi-ranlib \
-PKG_CONFIG=$DEVKITPRO/portlibs/wiiu/bin/powerpc-eabi-pkg-config && \
+--disable-docs && \
  cd lib && \
  make -j$(nproc) install && \
  cd ../include && \
@@ -135,8 +116,10 @@ RUN curl -LO https://libsdl.org/release/SDL2-2.26.5.tar.gz && \
   cd sdl && \
   patch -p1 < /SDL2-2.26.5.patch && \
   cd build && \
-  powerpc-eabi-cmake .. -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/wiiu && \
-  make -j$(nproc) install && \
+  cmake -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake -WIIU=1 -DWUT=1 \
+  -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu \
+  -DCMAKE_CXX_COMPILER=$DEVKITPPC/bin/powerpc-eabi-g++ .. && \
+  cmake --build . --config Release --target install -j$(nproc) && \
   cd ../.. && \
   rm -rf sdl SDL2-2.26.5.tar.gz
 
