@@ -323,8 +323,7 @@ static bool unzipUpdate(const RAMBUF *rambuf)
                                     }
                                     else
                                         break;
-                                }
-                                while(ret);
+                                } while(ret);
 
                                 addToIOQueue(NULL, 0, 0, file);
                             }
@@ -430,7 +429,7 @@ bool update(const char *newVersion, NUSSPLI_TYPE type)
     if(!unzipUpdate(rambuf))
         goto updateError;
 
-    // Uninstall currently running type/version
+        // Uninstall currently running type/version
 #ifndef NUSSPLI_LITE
     bool toUSB = getUSB() != NUSDEV_NONE;
     if(isChannel())
