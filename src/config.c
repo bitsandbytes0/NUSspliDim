@@ -32,13 +32,15 @@
 #include <staticMem.h>
 #include <utils.h>
 
+#include <jansson.h>
+
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/memory.h>
 #include <coreinit/time.h>
 #include <coreinit/userconfig.h>
-
-#include <jansson.h>
+#pragma GCC diagnostic pop
 
 #define CONFIG_VERSION   2
 

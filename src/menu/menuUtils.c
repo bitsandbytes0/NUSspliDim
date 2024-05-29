@@ -25,11 +25,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <coreinit/filesystem_fsa.h>
-#include <coreinit/mcp.h>
-#include <coreinit/memdefaultheap.h>
-#include <coreinit/memory.h>
-
 #include <file.h>
 #include <filesystem.h>
 #include <input.h>
@@ -43,6 +38,13 @@
 #include <titles.h>
 #include <tmd.h>
 #include <utils.h>
+
+#pragma GCC diagnostic ignored "-Wundef"
+#include <coreinit/filesystem_fsa.h>
+#include <coreinit/mcp.h>
+#include <coreinit/memdefaultheap.h>
+#include <coreinit/memory.h>
+#pragma GCC diagnostic pop
 
 static LIST *logList = NULL;
 

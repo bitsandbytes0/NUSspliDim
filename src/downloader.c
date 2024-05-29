@@ -43,6 +43,11 @@
 #include <tmd.h>
 #include <utils.h>
 
+#include <mbedtls/entropy.h>
+#include <mbedtls/ssl.h>
+#include <mbedtls/x509_crt.h>
+
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/memory.h>
 #include <coreinit/time.h>
@@ -50,10 +55,7 @@
 #include <nn/ac/ac_c.h>
 #include <nn/result.h>
 #include <nsysnet/_socket.h>
-
-#include <mbedtls/entropy.h>
-#include <mbedtls/ssl.h>
-#include <mbedtls/x509_crt.h>
+#pragma GCC diagnostic pop
 
 #define USERAGENT        "NUSspli/" NUSSPLI_VERSION
 #define SMOOTHING_FACTOR 0.2f

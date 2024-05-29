@@ -18,6 +18,8 @@
 
 #include <wut-fixups.h>
 
+#include <string.h>
+
 #include <config.h>
 #include <file.h>
 #include <filesystem.h>
@@ -32,11 +34,11 @@
 #include <tmd.h>
 #include <utils.h>
 
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/memory.h>
-
-#include <string.h>
+#pragma GCC diagnostic pop
 
 static int cursorPos = MAX_LINES - 5;
 

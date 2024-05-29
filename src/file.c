@@ -19,6 +19,11 @@
 
 #include <wut-fixups.h>
 
+#include <dirent.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
 #include <crypto.h>
 #include <file.h>
 #include <filesystem.h>
@@ -29,17 +34,14 @@
 #include <tmd.h>
 #include <utils.h>
 
-#include <dirent.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <sys/stat.h>
+#include <mbedtls/sha256.h>
 
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/memory.h>
 #include <coreinit/time.h>
-
-#include <mbedtls/sha256.h>
+#pragma GCC diagnostic pop
 
 bool fileExists(const char *path)
 {

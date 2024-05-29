@@ -21,11 +21,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <coreinit/filesystem_fsa.h>
-#include <coreinit/mcp.h>
-#include <coreinit/memory.h>
-#include <coreinit/time.h>
-
 #include <crypto.h>
 #include <deinstaller.h>
 #include <file.h>
@@ -41,6 +36,13 @@
 #include <staticMem.h>
 #include <ticket.h>
 #include <utils.h>
+
+#pragma GCC diagnostic ignored "-Wundef"
+#include <coreinit/filesystem_fsa.h>
+#include <coreinit/mcp.h>
+#include <coreinit/memory.h>
+#include <coreinit/time.h>
+#pragma GCC diagnostic pop
 
 #define IMPORTDIR_USB1 (NUSDIR_USB1 "usr/import/")
 #define IMPORTDIR_USB2 (NUSDIR_USB2 "usr/import/")

@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/cache.h>
 #include <coreinit/core.h>
 #include <coreinit/filesystem_fsa.h>
@@ -27,6 +28,7 @@
 #include <coreinit/memory.h>
 #include <coreinit/thread.h>
 #include <coreinit/time.h>
+#pragma GCC diagnostic pop
 
 #include <crypto.h>
 #include <file.h>

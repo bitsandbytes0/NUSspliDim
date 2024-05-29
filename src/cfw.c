@@ -22,14 +22,16 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include <state.h>
+#include <utils.h>
+
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/memory.h>
 #include <coreinit/title.h>
 #include <mocha/mocha.h>
 #include <rpxloader/rpxloader.h>
-
-#include <state.h>
-#include <utils.h>
+#pragma GCC diagnostic pop
 
 #define VALUE_A 0xE3A00000 // mov r0, #0
 #define VALUE_B 0xE12FFF1E // bx lr

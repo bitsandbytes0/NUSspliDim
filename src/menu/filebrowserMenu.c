@@ -19,6 +19,10 @@
 
 #include <wut-fixups.h>
 
+#include <dirent.h>
+#include <stdbool.h>
+#include <string.h>
+
 #include <crypto.h>
 #include <file.h>
 #include <filesystem.h>
@@ -32,13 +36,11 @@
 #include <renderer.h>
 #include <state.h>
 
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/memory.h>
-
-#include <dirent.h>
-#include <stdbool.h>
-#include <string.h>
+#pragma GCC diagnostic pop
 
 #define MAX_FILEBROWSER_LINES (MAX_LINES - 5)
 

@@ -22,6 +22,11 @@
 
 #include <wut-fixups.h>
 
+#include <inttypes.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+
 #include <config.h>
 #include <deinstaller.h>
 #include <downloader.h>
@@ -36,15 +41,12 @@
 #include <tmd.h>
 #include <utils.h>
 
-#include <inttypes.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/mcp.h>
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/memory.h>
+#pragma GCC diagnostic pop
 
 #define PD_MENU_ENTRIES 5
 

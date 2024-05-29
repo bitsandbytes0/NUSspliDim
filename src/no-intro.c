@@ -18,6 +18,8 @@
 
 #include <wut-fixups.h>
 
+#include <stdbool.h>
+
 #include <file.h>
 #include <filesystem.h>
 #include <ioQueue.h>
@@ -26,11 +28,11 @@
 #include <tmd.h>
 #include <utils.h>
 
-#include <stdbool.h>
-
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/memory.h>
+#pragma GCC diagnostic pop
 
 void destroyNoIntroData(NO_INTRO_DATA *data)
 {

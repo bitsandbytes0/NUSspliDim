@@ -19,6 +19,8 @@
 
 #include <wut-fixups.h>
 
+#include <stdbool.h>
+
 #include <cfw.h>
 #include <crypto.h>
 #include <exception.h>
@@ -26,6 +28,7 @@
 #include <state.h>
 #include <utils.h>
 
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/energysaver.h>
 #include <coreinit/foreground.h>
 #include <coreinit/mcp.h>
@@ -36,8 +39,7 @@
 #include <proc_ui/procui.h>
 #include <rpxloader/rpxloader.h>
 #include <sysapp/launch.h>
-
-#include <stdbool.h>
+#pragma GCC diagnostic pop
 
 volatile APP_STATE app;
 static bool shutdownEnabled = true;

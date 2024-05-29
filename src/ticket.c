@@ -19,6 +19,10 @@
 
 #include <wut-fixups.h>
 
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+
 #include <ticket.h>
 
 #include <crypto.h>
@@ -38,12 +42,10 @@
 #include <tmd.h>
 #include <utils.h>
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/memdefaultheap.h>
 #include <coreinit/memory.h>
+#pragma GCC diagnostic pop
 
 #define TICKET_BUCKET "/vol/slc/sys/rights/ticket/apps/"
 

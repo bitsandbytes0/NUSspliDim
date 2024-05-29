@@ -31,10 +31,12 @@
 #include <thread.h>
 #include <utils.h>
 
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/memory.h>
 #include <padscore/kpad.h>
 #include <padscore/wpad.h>
 #include <vpad/input.h>
+#pragma GCC diagnostic pop
 
 #define SWKBD_QUEUE_SIZE 8
 

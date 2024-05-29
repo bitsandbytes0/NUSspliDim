@@ -19,6 +19,8 @@
 
 #include <wut-fixups.h>
 
+#include <string.h>
+
 #include <input.h>
 #include <list.h>
 #include <localisation.h>
@@ -29,9 +31,9 @@
 #include <renderer.h>
 #include <state.h>
 
-#include <string.h>
-
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/memory.h>
+#pragma GCC diagnostic pop
 
 #define MAX_ENTRIES (MAX_LINES - 4)
 #ifndef NUSSPLI_LITE

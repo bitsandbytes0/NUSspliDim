@@ -21,16 +21,18 @@
 
 #include <stdlib.h>
 
-#include <coreinit/messagequeue.h>
-#include <nn/acp/drcled_c.h>
-#include <padscore/wpad.h>
-#include <vpad/input.h>
-
 #include <config.h>
 #include <messages.h>
 #include <osdefs.h>
 #include <thread.h>
 #include <utils.h>
+
+#pragma GCC diagnostic ignored "-Wundef"
+#include <coreinit/messagequeue.h>
+#include <nn/acp/drcled_c.h>
+#include <padscore/wpad.h>
+#include <vpad/input.h>
+#pragma GCC diagnostic pop
 
 #define RUMBLE_QUEUE_SIZE 2
 #define LED_ON            1

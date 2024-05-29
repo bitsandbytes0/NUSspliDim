@@ -18,6 +18,12 @@
 
 #include <wut-fixups.h>
 
+#include <file.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+
 #include <config.h>
 #include <deinstaller.h>
 #include <downloader.h>
@@ -34,6 +40,12 @@
 #include <state.h>
 #include <utils.h>
 
+#include <ioapi.h>
+#include <unzip.h>
+
+#include <jansson.h>
+
+#pragma GCC diagnostic ignored "-Wundef"
 #include <coreinit/dynload.h>
 #include <coreinit/filesystem_fsa.h>
 #include <coreinit/mcp.h>
@@ -41,17 +53,7 @@
 #include <coreinit/memory.h>
 #include <coreinit/thread.h>
 #include <rpxloader/rpxloader.h>
-
-#include <ioapi.h>
-#include <unzip.h>
-
-#include <file.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-
-#include <jansson.h>
+#pragma GCC diagnostic pop
 
 #define UPDATE_CHECK_URL    NAPI_URL "s?t="
 #define UPDATE_DOWNLOAD_URL "https://github.com/V10lator/NUSspli/releases/download/v"
