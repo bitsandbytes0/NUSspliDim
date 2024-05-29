@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
  PATH=$DEVKITPPC/bin:$DEVKITPRO/portlibs/wiiu/bin/:$PATH \
  WUT_ROOT=$DEVKITPRO/wut \
  CC=$DEVKITPPC/bin/powerpc-eabi-gcc \
+ CXX=$DEVKITPPC/bin/powerpc-eabi-g++ \
  AR=$DEVKITPPC/bin/powerpc-eabi-ar \
  RANLIB=$DEVKITPPC/bin/powerpc-eabi-ranlib \
  PKG_CONFIG=$DEVKITPRO/portlibs/wiiu/bin/powerpc-eabi-pkg-config \
@@ -54,8 +55,7 @@ RUN curl -LO https://github.com/nghttp2/nghttp2/releases/download/v$NGHTTP2_VER/
 RUN git clone --depth 1 --single-branch https://github.com/google/brotli.git && \
  cd brotli && \
  mkdir out && cd out && \
- cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu/ -DBUILD_SHARED_LIBS=OFF -DBROTLI_BUILD_TOOLS=OFF \
- -DCMAKE_CXX_COMPILER=$DEVKITPPC/bin/powerpc-eabi-g++ .. && \
+ cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu/ -DBUILD_SHARED_LIBS=OFF -DBROTLI_BUILD_TOOLS=OFF .. && \
  cmake --build . --config Release --target install -j$(nproc) && \
  cd ../.. && \
  rm -rf brotli
@@ -119,8 +119,7 @@ RUN curl -LO https://libsdl.org/release/SDL2-2.26.5.tar.gz && \
   patch -p1 < /SDL2-2.26.5.patch && \
   cd build && \
   cmake -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake -WIIU=1 -DWUT=1 \
-  -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu \
-  -DCMAKE_CXX_COMPILER=$DEVKITPPC/bin/powerpc-eabi-g++ .. && \
+  -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu .. && \
   cmake --build . --config Release --target install -j$(nproc) && \
   cd ../.. && \
   rm -rf sdl SDL2-2.26.5.tar.gz SDL2-2.26.5.patch
