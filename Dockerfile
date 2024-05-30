@@ -112,17 +112,17 @@ RUN curl -LO https://curl.se/download/curl-$CURL_VER.tar.xz && \
 
 # Install libSDL since upstream is bugged
 RUN curl -LO https://libsdl.org/release/SDL2-2.26.5.tar.gz && \
-  curl -LO https://github.com/devkitPro/wut-packages/raw/3e10387023ced5d8baeb1ed161972d20bc8cdfa4/SDL2/SDL2-2.26.5.patch && \
+  curl -LO https://github.com/V10lator/NUSspli/raw/master/sdl.patch && \
   mkdir -p sdl/build && \
   tar xzf SDL2-2.26.5.tar.gz -C /sdl --strip-components=1 && \
   cd sdl && \
-  patch -p1 < /SDL2-2.26.5.patch && \
+  patch -p1 < /sdl.patch && \
   cd build && \
   cmake -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/wut/share/wut.toolchain.cmake -WIIU=1 -DWUT=1 \
   -DCMAKE_BUILD_TYPE="Release" -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wiiu .. && \
   cmake --build . --config Release --target install -j$(nproc) && \
   cd ../.. && \
-  rm -rf sdl SDL2-2.26.5.tar.gz SDL2-2.26.5.patch
+  rm -rf sdl SDL2-2.26.5.tar.gz sdl.patch
 
 RUN git config --global --add safe.directory /project && \
   git config --global --add safe.directory /project/SDL_FontCache && \
