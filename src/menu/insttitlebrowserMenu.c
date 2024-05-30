@@ -248,7 +248,7 @@ static OSThread *initITBMenu()
 
                     ititleEntrySize = s;
                     asyncState = ASYNC_STATE_FWD;
-                    OSThread *ret = startThread("NUSspli title loader", THREAD_PRIORITY_MEDIUM, STACKSIZE_MEDIUM, asyncTitleLoader, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_CPU2);
+                    OSThread *ret = startThread("NUSspli title loader", THREAD_PRIORITY_MEDIUM, STACKSIZE_MEDIUM, asyncTitleLoader, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_CPU0);
                     if(ret)
                         return ret;
 

@@ -133,7 +133,7 @@ bool initIOThread()
             activeReadBuffer = activeWriteBuffer = 0;
             ioRunning = true;
 
-            ioThread = startThread("NUSspli I/O", THREAD_PRIORITY_HIGH, STACKSIZE_SMALL, ioThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_CPU0); // We move this to core 0 for maximum performance. Later on move it back to core 1 as we want download threads on core 0 and 2.
+            ioThread = startThread("NUSspli I/O", THREAD_PRIORITY_HIGH, STACKSIZE_SMALL, ioThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_CPU2); // We move this to core 2 for maximum performance. Later on move it back to core 1 as we want download threads on core 0 and 2.
             if(ioThread != NULL)
                 return true;
 

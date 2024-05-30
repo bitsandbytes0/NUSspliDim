@@ -527,7 +527,7 @@ int downloadFile(const char *url, char *file, downloadData *data, FileType type,
     OSTime t = OSGetSystemTime();
 
     char *argv[1] = { (char *)&cdata };
-    OSThread *dlThread = startThread("NUSspli downloader", THREAD_PRIORITY_HIGH, STACKSIZE_BIG, dlThreadMain, 1, (char *)argv, OS_THREAD_ATTRIB_AFFINITY_CPU2);
+    OSThread *dlThread = startThread("NUSspli downloader", THREAD_PRIORITY_HIGH, STACKSIZE_BIG, dlThreadMain, 1, (char *)argv, OS_THREAD_ATTRIB_AFFINITY_CPU0);
     if(dlThread == NULL)
         return 1;
 

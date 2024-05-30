@@ -73,7 +73,7 @@ bool initNotifications()
 {
     pId = GetPersistentId();
     OSInitMessageQueueEx(&rumble_queue, rumble_msg, RUMBLE_QUEUE_SIZE, "NUSspli rumble queue");
-    rumbleThread = startThread("NUSspli Rumble", THREAD_PRIORITY_LOW, STACKSIZE_SMALL, rumbleThreadMain, 0, NULL, AFFINITY_CPU01);
+    rumbleThread = startThread("NUSspli Rumble", THREAD_PRIORITY_LOW, STACKSIZE_SMALL, rumbleThreadMain, 0, NULL, AFFINITY_CPU12);
     return rumbleThread != NULL;
 }
 
