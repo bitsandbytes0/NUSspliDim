@@ -21,17 +21,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /
 
-# Install apt-fast
-RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2 && \
- /bin/bash -c "$(curl -sL https://raw.githubusercontent.com/V10lator/NUSspli/master/apt-fast/install.sh)"
-
 # Upgrade the systen
-RUN apt-fast -y --no-install-recommends update && \
- apt-fast -y --no-install-recommends upgrade
+RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2 && \
+ apt-get -y --no-install-recommends update && \
+ apt-get -y --no-install-recommends upgrade
 
 # Install the requirements to package the homebrew
-RUN apt-fast -y install --no-install-recommends autoconf automake libtool openjdk-11-jre-headless python3-pycurl && \
- apt-fast clean
+RUN apt-get -y install --no-install-recommends autoconf automake libtool openjdk-11-jre-headless python3-pycurl && \
+ apt-get clean
 
 # Install nghttp2 for HTTP/2 support (WUT don't include this)
 RUN curl -LO https://github.com/nghttp2/nghttp2/releases/download/v$NGHTTP2_VER/nghttp2-$NGHTTP2_VER.tar.xz && \
