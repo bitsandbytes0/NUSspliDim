@@ -158,7 +158,7 @@ static bool SWKBD_Show(SWKBD_Args *args, KeyboardLayout layout, KeyboardType typ
         return false;
     }
 
-    args->calcThread = startThread("NUSspli SWKBD font calculator", THREAD_PRIORITY_MEDIUM, STACKSIZE_SMALL, calcThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_ANY);
+    args->calcThread = startThread("NUSspli SWKBD font calculator", THREAD_PRIORITY_MEDIUM, STACKSIZE_SMALL, calcThreadMain, 0, NULL, AFFINITY_CPU01);
     if(args->calcThread == NULL)
     {
         debugPrintf("SWKBD: Can't spawn calc thread!");

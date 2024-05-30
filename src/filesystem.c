@@ -56,7 +56,7 @@ static int spaceThreadMain(int argc, const char **argv)
 
 void initFSSpace()
 {
-    spaceThread = startThread("NUSspli FS Initialiser", THREAD_PRIORITY_MEDIUM, STACKSIZE_SMALL, spaceThreadMain, 0, NULL, OS_THREAD_ATTRIB_AFFINITY_ANY);
+    spaceThread = startThread("NUSspli FS Initialiser", THREAD_PRIORITY_MEDIUM, STACKSIZE_SMALL, spaceThreadMain, 0, NULL, AFFINITY_CPU01);
 }
 
 bool initFS(bool validCfw)
