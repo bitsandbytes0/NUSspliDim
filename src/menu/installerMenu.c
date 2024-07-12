@@ -196,7 +196,10 @@ refreshDir:
         showFrame();
 
         if(vpad.trigger & VPAD_BUTTON_B)
+        {
+            MEMFreeToDefaultHeap((TMD *)tmd);
             goto grabNewDir;
+        }
 
         if(vpad.trigger & VPAD_BUTTON_PLUS)
         {
@@ -260,9 +263,6 @@ refreshDir:
     return;
 
 grabNewDir:
-    if(tmd != NULL)
-        MEMFreeToDefaultHeap((TMD *)tmd);
-
     MEMFreeToDefaultHeap((char *)dir);
     if(AppRunning(true))
     {
