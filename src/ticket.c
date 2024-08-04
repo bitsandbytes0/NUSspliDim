@@ -98,12 +98,12 @@ static void generateHeader(FileType type, NUS_HEADER *out)
     osslBytes(out->rand_area, sizeof(out->rand_area));
 }
 
-bool generateTik(const char *path, const TitleEntry *titleEntry, const TMD *tmd)
+bool generateTik(const char *path, const TMD *tmd)
 {
     TICKET ticket;
     OSBlockSet(&ticket, 0x00, sizeof(TICKET));
 
-    if(!generateKey(titleEntry, ticket.key))
+    if(!generateKey(tmd->tid, ticket.key))
         return false;
 
     generateHeader(FILE_TYPE_TIK, &ticket.header);
@@ -351,13 +351,8 @@ gftEntry:
             if(!generateCert(tmd, NULL, 0, dir))
                 break;
 
-            const TitleEntry *entry = getTitleEntryByTid(tmd->tid);
-            const TitleEntry te = { .name = "UNKNOWN", .tid = tmd->tid, .region = MCP_REGION_UNKNOWN, .key = 99 };
-            if(entry == NULL)
-                entry = &te;
-
             strcpy(ptr, "tik");
-            if(!generateTik(dir, entry, tmd))
+            if(!generateTik(dir, tmd))
                 break;
 
             drawTicketGenFrame(dir);

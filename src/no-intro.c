@@ -230,7 +230,7 @@ NO_INTRO_DATA *transformNoIntro(const char *path)
     if(!data->hadTicket)
     {
         debugPrintf("Creating ticket at at %s", data->path);
-        if(!generateTik(data->path, getTitleEntryByTid(tmd->tid), tmd))
+        if(!generateTik(data->path, tmd))
         {
             debugPrintf("Error creating ticket at %s", data->path);
             goto transformError2;

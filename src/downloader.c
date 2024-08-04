@@ -1046,7 +1046,7 @@ bool downloadTitle(const TMD *tmd, size_t tmdSize, const TitleEntry *titleEntry,
         switch(tikRes)
         {
             case 2:
-                if(!generateTik(installDir, titleEntry, tmd))
+                if(!generateTik(installDir, tmd))
                     return false;
 
                 addToScreenLog("Fake ticket created successfully");
