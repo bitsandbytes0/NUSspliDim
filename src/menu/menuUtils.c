@@ -430,6 +430,46 @@ void showNoSpaceOverlay(NUSDEV dev)
         removeErrorOverlay(ovl);
     }
 }
+
+bool showExitOverlay()
+{
+    const char *extMsg = localise("Do you really want to exit?");
+    const char *yes = localise("Yes");
+    const char *no = localise("No");
+
+    size_t extMsgS = strlen(extMsg);
+    size_t yesS = strlen(yes);
+    size_t noS = strlen(no);
+
+    char ovlMsg[extMsgS + 2 /* "\n\n" */ + sizeof(BUTTON_A) /* not -1 cause space after it */ + yesS + 4 /* " || " */ + sizeof(BUTTON_B) + ++noS];
+    OSBlockMove(ovlMsg, extMsg, extMsgS, false);
+    OSBlockMove(ovlMsg + extMsgS, "\n\n" BUTTON_A " ", sizeof("\n\n" BUTTON_A) /* not -1 cause space after it */, false);
+    OSBlockMove(ovlMsg + extMsgS + sizeof("\n\n" BUTTON_A), yes, yesS, false);
+    OSBlockMove(ovlMsg + extMsgS + sizeof("\n\n" BUTTON_A) + yesS, " || " BUTTON_B " ", sizeof(" || " BUTTON_B), false);
+    OSBlockMove(ovlMsg + extMsgS + sizeof("\n\n" BUTTON_A) + yesS + sizeof(" || " BUTTON_B), no, noS, false);
+
+    void *ovl = addErrorOverlay(ovlMsg);
+    if(ovl == NULL)
+        return true;
+
+    bool ret = false;
+    while(AppRunning(true))
+    {
+        showFrame();
+
+        if(vpad.trigger & VPAD_BUTTON_A)
+        {
+            ret = true;
+            break;
+        }
+        if(vpad.trigger & VPAD_BUTTON_B)
+            break;
+    }
+
+    removeErrorOverlay(ovl);
+    return ret;
+}
+
 void humanize(uint64_t size, char *out)
 {
     const char *m;

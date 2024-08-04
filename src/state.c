@@ -24,6 +24,7 @@
 #include <cfw.h>
 #include <crypto.h>
 #include <exception.h>
+#include <menu/utils.h>
 #include <renderer.h>
 #include <state.h>
 #include <utils.h>
@@ -113,9 +114,7 @@ bool isChannel()
 
 uint32_t homeButtonCallback(void *dummy)
 {
-    (void)dummy;
-
-    if(shutdownEnabled)
+    if(shutdownEnabled && dummy == (void *)false && showExitOverlay())
     {
         shutdownEnabled = false;
         app = APP_STATE_HOME;
@@ -136,7 +135,7 @@ void initState()
     debugInit();
     debugPrintf("NUSspli " NUSSPLI_VERSION);
 
-    ProcUIRegisterCallback(PROCUI_CALLBACK_HOME_BUTTON_DENIED, &homeButtonCallback, NULL, 100);
+    ProcUIRegisterCallback(PROCUI_CALLBACK_HOME_BUTTON_DENIED, &homeButtonCallback, (void *)false, 100);
     OSEnableHomeButtonMenu(false);
     ACPInitialize();
 

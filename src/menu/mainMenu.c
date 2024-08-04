@@ -105,11 +105,13 @@ void mainMenu()
 
         if(vpad.trigger & VPAD_BUTTON_B)
         {
-            drawByeFrame();
-            return;
+            if(showExitOverlay())
+            {
+                drawByeFrame();
+                return;
+            }
         }
-
-        if(vpad.trigger & VPAD_BUTTON_A)
+        else if(vpad.trigger & VPAD_BUTTON_A)
         {
             switch(cursorPos)
             {
