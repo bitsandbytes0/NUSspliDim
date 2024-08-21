@@ -84,7 +84,7 @@ static void drawFBMenuFrame(const char *path, LIST *folders, size_t pos, const s
     char *folder;
     TitleData *title;
     char fp[FS_MAX_PATH];
-    size_t i = strlen(path);;
+    size_t i = strlen(path);
     OSBlockMove(fp, path, i, false);
     l = fp + i;
     i = 0;
