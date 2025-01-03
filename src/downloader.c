@@ -55,6 +55,7 @@
 #include <nn/ac/ac_c.h>
 #include <nn/result.h>
 #include <nsysnet/_socket.h>
+#include <nsysnet/netconfig.h>
 #pragma GCC diagnostic pop
 
 #define USERAGENT        "NUSspli/" NUSSPLI_VERSION
@@ -242,6 +243,54 @@ bool initDownloader()
     if(blob.data == NULL)
         return false;
 
+    char pUrl[sizeof("http://") + 0x80 /* host */ + 0x40 /* user and pass */ + 5 /* port */ + 3 /* rest */] = "http://"; // TODO;
+    char *pUrl2 = NULL;
+
+    if(netconf_init() == 0)
+    {
+        NetConfProxyConfig proxy;
+        if(netconf_get_proxy_config(&proxy) == 0)
+        {
+            if(proxy.use_proxy == NET_CONF_PROXY_ENABLED)
+            {
+                pUrl2 = pUrl + sizeof("http://") - 1;
+                size_t ss;
+
+                if(proxy.auth_type == NET_CONF_PROXY_AUTH_TYPE_BASIC_AUTHENTICATION)
+                {
+                    ss = strlen(proxy.username);
+                    OSBlockMove(pUrl2, proxy.username, ss, false);
+                    pUrl2 += ss;
+
+                    *pUrl2 = ':';
+
+                    ss = strlen(proxy.password);
+                    OSBlockMove(++pUrl2, proxy.password, ss, false);
+                    pUrl2 += ss;
+
+                    *pUrl2 = '@';
+                    ++pUrl2;
+                }
+
+                ss = strlen(proxy.host);
+                OSBlockMove(pUrl2, proxy.host, ss, false);
+                pUrl2 += ss;
+
+                *pUrl2 = ':';
+                itoa(proxy.port, ++pUrl2, 10);
+
+                pUrl2 = pUrl;
+                debugPrintf("Proxy: %s", pUrl2);
+            }
+        }
+        else
+            debugPrintf("Proxy error!");
+
+        netconf_close();
+    }
+    else
+        debugPrintf("Netconf error!");
+
     CURLcode ret = curl_global_init(CURL_GLOBAL_DEFAULT & ~(CURL_GLOBAL_SSL));
     if(ret == CURLE_OK)
     {
@@ -296,7 +345,12 @@ bool initDownloader()
                                                     opt = CURLOPT_ACCEPT_ENCODING;
                                                     ret = curl_easy_setopt(curl, opt, "");
                                                     if(ret == CURLE_OK)
-                                                        return true;
+                                                    {
+                                                        opt = CURLOPT_PROXY;
+                                                        ret = curl_easy_setopt(curl, opt, pUrl2);
+                                                        if(ret == CURLE_OK)
+                                                            return true;
+                                                    }
                                                 }
                                             }
 
