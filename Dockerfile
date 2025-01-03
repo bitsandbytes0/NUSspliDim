@@ -16,8 +16,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
  LDFLAGS="-L$DEVKITPRO/wut/lib" \
  LIBS="-lwut -lm" \
  BROTLI_VER=1.1.0 \
- CURL_VER=8.9.1 \
- NGHTTP2_VER=1.62.0
+ CURL_VER=8.11.1 \
+ NGHTTP2_VER=1.64.0
 
 WORKDIR /
 
