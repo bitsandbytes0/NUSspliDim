@@ -116,7 +116,7 @@ extern "C"
         return true;
     }
 
-#define forEachListEntry(x, y) for(ELEMENT *cur = x->first; cur != NULL && (y = cur->content); cur = cur->next)
+#define forEachListEntry(l_x, l_y) for(ELEMENT *l_cur = l_x->first; l_cur != NULL && (l_y = l_cur->content); l_cur = l_cur->next)
 
     static inline void removeFromList(LIST *list, void *content)
     {
@@ -246,7 +246,7 @@ extern "C"
         return list->last->content;
     }
 
-#define getListSize(x) (x->size)
+#define getListSize(ls_x) (ls_x->size)
 
 #ifdef __cplusplus
 }
