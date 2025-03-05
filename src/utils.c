@@ -333,8 +333,10 @@ void shutdownDebug()
 
 void restartUdpLog()
 {
+    spinLock(debugLock);
     WHBLogUdpDeinit();
     WHBLogUdpInit();
+    spinReleaseLock(debugLock);
 }
 
 void debugPrintf(const char *str, ...)
