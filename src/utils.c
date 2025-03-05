@@ -331,10 +331,14 @@ void shutdownDebug()
     WHBLogCafeDeinit();
 }
 
-void restartUdpLog()
+void restartUdpLog1()
 {
     spinLock(debugLock);
     WHBLogUdpDeinit();
+}
+
+void restartUdpLog2()
+{
     WHBLogUdpInit();
     spinReleaseLock(debugLock);
 }

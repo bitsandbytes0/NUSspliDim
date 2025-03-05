@@ -47,7 +47,8 @@
 #define checkStacks(...)
 #define debugInit()
 #define shutdownDebug()
-#define restartUdpLog()
+#define restartUdpLog1()
+#define restartUdpLog2()
 #endif
 
 #ifdef __cplusplus
@@ -85,7 +86,8 @@ extern "C"
 #ifdef NUSSPLI_DEBUG
     void debugInit();
     void shutdownDebug();
-    void restartUdpLog() __attribute__((__cold__));
+    void restartUdpLog1() __attribute__((__cold__));
+    void restartUdpLog2() __attribute__((__cold__));
     void debugPrintf(const char *str, ...);
     void checkStacks(const char *src);
 #endif

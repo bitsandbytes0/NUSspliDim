@@ -55,6 +55,7 @@
 #include <nn/ac/ac_c.h>
 #include <nn/result.h>
 #include <nsysnet/_socket.h>
+#include <nsysnet/misc.h>
 #include <nsysnet/netconfig.h>
 #pragma GCC diagnostic pop
 
@@ -191,47 +192,42 @@ static CURLcode ssl_ctx_init(CURL *cu, void *sslctx, void *parm)
 // We're not using WUTs NNResult_IsSuccess() / NNResult_IsFailure() here as it's wrong
 static void resetNetwork()
 {
-    debugPrintf("Resetting network!");
+    BOOL con;
+    NNResult nnres = ACIsApplicationConnected(&con);
+    if(nnres.value != 0 || con)
+        return;
+
+    void *ovl = addErrorOverlay(localise("Preparing. This might take some time. Please be patient."));
     // Disconnect from network
-    NNResult nnres = ACClose();
+    deinitDownloader();
+    restartUdpLog1();
+    socket_lib_finish();
+    nnres = ACClose();
     NNResult cr;
     do
     {
         cr = ACGetCloseStatus(nnres);
         if(cr.value == -1) // FAILED
-            return;
+            goto not_closed;
     } while(cr.value != 0); // SUCCESS. A value of 1 means processing, so we're not handling it.
 
-    // Close AC library
-    uint32_t c = 0;
-closeAClib:
-    ACFinalize();
-    c++;
-
-    // Reopen AC library
-    nnres = ACInitialize();
-    if(nnres.value != 0) // Already initialised
-    {
-        ACFinalize(); // we close two times here to revert out init as well as whatever did it before
-        goto closeAClib;
-    }
-
-    // Set init counter to what it was before
-    if(--c)
-        while(c--)
-            ACInitialize();
-
     // Connect to network
-    for(; c < 1024; c++)
+    for(unsigned int c = 0; c < 1024; c++)
     {
         nnres = ACConnect();
         if(nnres.value == 0)
             break;
     }
 
-    restartUdpLog();
-    deinitDownloader();
+not_closed:
+    socket_lib_init();
+    set_multicast_state(true);
+
+    restartUdpLog2();
     initDownloader();
+
+    if(ovl)
+        removeErrorOverlay(ovl);
 }
 
 bool initDownloader()
