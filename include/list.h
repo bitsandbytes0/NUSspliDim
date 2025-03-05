@@ -69,7 +69,8 @@ extern "C"
             MEMFreeToDefaultHeap(tmp);
         }
 
-        OSBlockSet(&list->last, 0x00, sizeof(LIST) - sizeof(ELEMENT));
+        list->last = NULL;
+        list->size = 0;
     }
 
     static inline void destroyList(LIST *list, bool freeContents)
