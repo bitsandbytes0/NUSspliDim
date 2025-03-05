@@ -833,8 +833,8 @@ int downloadFile(const char *url, char *file, downloadData *data, FileType type,
                 break;
             if(vpad.trigger & VPAD_BUTTON_Y || (autoResumeEnabled() && --frames == 0))
             {
-                flushIOQueue(); // We flush here so the last file is completely on disc and closed before we retry.
                 resetNetwork(); // Recover from network errors.
+                flushIOQueue(); // We flush here so the last file is completely on disc and closed before we retry.
                 return downloadFile(url, file, data, type, resume, queueData, rambuf);
             }
         }
