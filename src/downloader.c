@@ -62,6 +62,7 @@
 #define USERAGENT        "NUSspli/" NUSSPLI_VERSION
 #define SMOOTHING_FACTOR 0.2f
 
+static bool initialised = false;
 static CURL *curl;
 static char curlError[CURL_ERROR_SIZE];
 static bool curlReuseConnection = true;
@@ -189,6 +190,63 @@ static CURLcode ssl_ctx_init(CURL *cu, void *sslctx, void *parm)
 
 #define initNetwork() (curlReuseConnection = false)
 
+static bool showNetworkError(const char *err)
+{
+    char *toScreen = getToFrameBuffer();
+    if(toScreen != err)
+        strcpy(toScreen, err);
+
+    int os = 0;
+    int frames = 0;
+    char *p = NULL;
+    if(autoResumeEnabled())
+    {
+        os = 9 * 60; // 9 seconds with 60 FPS
+        frames = os;
+        strcat(toScreen, "\n\n");
+        p = toScreen + strlen(toScreen);
+        const char *pt = localise("Next try in _ seconds.");
+        strcpy(p, pt);
+        const char *n = strchr(pt, '_');
+        p += n - pt;
+    }
+    else
+        drawErrorFrame(toScreen, B_RETURN | Y_RETRY);
+
+    int s;
+    bool ret = false;
+    while(AppRunning(true))
+    {
+        if(app == APP_STATE_BACKGROUND)
+            continue;
+        else if(app == APP_STATE_RETURNING)
+            drawErrorFrame(toScreen, B_RETURN | Y_RETRY);
+
+        if(autoResumeEnabled())
+        {
+            s = frames / 60;
+            if(s != os)
+            {
+                *p = '1' + s;
+                os = s;
+                drawErrorFrame(toScreen, B_RETURN | Y_RETRY);
+            }
+        }
+
+        showFrame();
+
+        if(vpad.trigger & VPAD_BUTTON_B)
+            break;
+        if(vpad.trigger & VPAD_BUTTON_Y || (autoResumeEnabled() && --frames == 0))
+        {
+            ret = true;
+            break;
+        }
+    }
+
+    return ret;
+}
+
 // We're not using WUTs NNResult_IsSuccess() / NNResult_IsFailure() here as it's wrong
 static void resetNetwork()
 {
@@ -198,36 +256,62 @@ static void resetNetwork()
         return;
 
     void *ovl = addErrorOverlay(localise("Preparing. This might take some time. Please be patient."));
+
     // Disconnect from network
     deinitDownloader();
     restartUdpLog1();
     socket_lib_finish();
-    nnres = ACClose();
     NNResult cr;
+
+closeAgain:
+    nnres = ACClose();
     do
     {
         cr = ACGetCloseStatus(nnres);
         if(cr.value == -1) // FAILED
-            goto not_closed;
+        {
+            if(ovl)
+                removeErrorOverlay(ovl);
+
+            if(showNetworkError(localise("Error closing network!")))
+            {
+                ovl = addErrorOverlay(localise("Preparing. This might take some time. Please be patient."));
+                goto closeAgain;
+            }
+
+            goto exitApp;
+        }
     } while(cr.value != 0); // SUCCESS. A value of 1 means processing, so we're not handling it.
 
     // Connect to network
-    for(unsigned int c = 0; c < 1024; c++)
+reconnect:
+    nnres = ACConnect();
+    if(nnres.value == 0)
     {
-        nnres = ACConnect();
-        if(nnres.value == 0)
-            break;
+        socket_lib_init();
+        set_multicast_state(true);
+
+        restartUdpLog2();
+        initDownloader();
+
+        if(ovl)
+            removeErrorOverlay(ovl);
+
+        return;
     }
-
-not_closed:
-    socket_lib_init();
-    set_multicast_state(true);
-
-    restartUdpLog2();
-    initDownloader();
 
     if(ovl)
         removeErrorOverlay(ovl);
+
+    if(showNetworkError(localise("Error connecting to network!")))
+    {
+        ovl = addErrorOverlay(localise("Preparing. This might take some time. Please be patient."));
+        goto reconnect;
+    }
+
+exitApp:
+    if(AppRunning(true))
+        homeButtonCallback((void *)true);
 }
 
 bool initDownloader()
@@ -345,7 +429,10 @@ bool initDownloader()
                                                         opt = CURLOPT_PROXY;
                                                         ret = curl_easy_setopt(curl, opt, pUrl2);
                                                         if(ret == CURLE_OK)
+                                                        {
+                                                            initialised = true;
                                                             return true;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -380,12 +467,16 @@ bool initDownloader()
 
 void deinitDownloader()
 {
+    if(!initialised)
+        return;
+
     if(curl != NULL)
     {
         curl_easy_cleanup(curl);
         curl = NULL;
     }
     curl_global_cleanup();
+    initialised = false;
 }
 
 static int dlThreadMain(int argc, const char **argv)
@@ -787,53 +878,13 @@ int downloadFile(const char *url, char *file, downloadData *data, FileType type,
         if(data != NULL && cancelOverlay != NULL)
             closeCancelOverlay();
 
-        int os;
-
-        char *p;
-        if(autoResumeEnabled())
+        if(showNetworkError(toScreen))
         {
-            os = 9 * 60; // 9 seconds with 60 FPS
-            frames = os;
-            strcat(toScreen, "\n\n");
-            p = toScreen + strlen(toScreen);
-            const char *pt = localise("Next try in _ seconds.");
-            strcpy(p, pt);
-            const char *n = strchr(pt, '_');
-            p += n - pt;
+            resetNetwork();
+            flushIOQueue(); // We flush here so the last file is completely on disc and closed before we retry.
+            return downloadFile(url, file, data, type, resume, queueData, rambuf);
         }
-        else
-            drawErrorFrame(toScreen, B_RETURN | Y_RETRY);
 
-        int s;
-        while(AppRunning(true))
-        {
-            if(app == APP_STATE_BACKGROUND)
-                continue;
-            else if(app == APP_STATE_RETURNING)
-                drawErrorFrame(toScreen, B_RETURN | Y_RETRY);
-
-            if(autoResumeEnabled())
-            {
-                s = frames / 60;
-                if(s != os)
-                {
-                    *p = '1' + s; // p is initialised
-                    os = s;
-                    drawErrorFrame(toScreen, B_RETURN | Y_RETRY);
-                }
-            }
-
-            showFrame();
-
-            if(vpad.trigger & VPAD_BUTTON_B)
-                break;
-            if(vpad.trigger & VPAD_BUTTON_Y || (autoResumeEnabled() && --frames == 0))
-            {
-                resetNetwork(); // Recover from network errors.
-                flushIOQueue(); // We flush here so the last file is completely on disc and closed before we retry.
-                return downloadFile(url, file, data, type, resume, queueData, rambuf);
-            }
-        }
         resetNetwork();
         return 1;
     }
