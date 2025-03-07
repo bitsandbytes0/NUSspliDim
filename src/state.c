@@ -113,7 +113,7 @@ bool isChannel()
 
 uint32_t homeButtonCallback(void *dummy)
 {
-    if(shutdownEnabled && dummy == (void *)false && showExitOverlay(true))
+    if(((bool)dummy) || (shutdownEnabled && showExitOverlay(true)))
     {
         shutdownEnabled = false;
         app = APP_STATE_HOME;
