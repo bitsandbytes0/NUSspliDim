@@ -174,7 +174,7 @@
     "Couldn't resolve hostname": "No se ha podido resolver el nombre de host",
     "Couldn't connect to server": "No se ha podido conectar con el servidor",
     "Operation timed out": "El tiempo de espera de la operación ha expirado",
-    "The server didn't return any data": "La respuesta del servidor ha sido nula",
+    "The server didn't return any data": "El servidor no devolvió ningún dato",
     "I/O error": "Error de E/S",
     "Verification failed": "Verificación fallida",
     "Handshake failed": "Handshake fallido",
@@ -182,7 +182,7 @@
     "Unknown libcurl error": "Error desconocido de libcurl",
     "Do you really want to cancel?": "¿Realmente quieres cancelar?",
     "The download of title.tmd failed with error: 404": "La descarga de <title.tmd> ha fallado con error 404.",
-    "The title cannot be found on the NUS, maybe the provided title ID doesn't exists or\nthe TMD was deleted": "El título no ha sido encontrado en NUS, puede que el ID del título no exista o\nel TMD haya sido eliminado.",
+    "The title cannot be found on the NUS, maybe the provided title ID doesn't exists or\nthe TMD was deleted": "El título no ha sido encontrado en los servidores (NUS), puede que el ID del título no exista o\nel archivo (TMD) haya sido eliminado.",
     "The download returned a result different to 200 (OK)": "La descarga devolvió un resultado diferente a 200 (OK)",
     "Request failed. Try again": "Petición fallida. Inténtalo de nuevo.",
 
