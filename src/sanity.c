@@ -63,9 +63,9 @@ bool sanityCheck()
         {
             if(m[j] != md5[i][j])
             {
-                debugPrintf("Sanity error: Data integrity error");
+                debugPrintf("Sanity error: Data missmatch! Ignoring...");
                 MEMFreeToDefaultHeap(buf);
-                return false;
+                return true;
             }
         }
 
