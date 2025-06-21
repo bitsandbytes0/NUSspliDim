@@ -31,3 +31,6 @@ To install the app, download and unzip the contents of the [latest release](http
 
 # Info
 NUSspli is based on [WUPDownloader](https://github.com/Pokes303/WUPDownloader) by Pokes303.
+
+# Theming
+You can retheme this to however you'd like. The color info is located in the renderer.c file in /src. If you'd like to change the textures, they're split between /data and /meta for in-app trxtures and boot/menu textures respectively. Originally, there was a "Sanity check" on file integrity, but this was easily circumvented in /src/sanity.c. Enjoy.
